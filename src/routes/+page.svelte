@@ -4,9 +4,24 @@
 	import Textarea from '$lib/components/textarea.svelte';
 	import { CheckIcon } from '@lucide/svelte';
 	import FaqItem from './faq-item.svelte';
+	import { submit } from './submit.remote';
+
+	const { domains, email } = submit.fields;
+
+	let submitError = false;
+
+	const enhancedSubmit = submit.enhance(async ({ form, submit }) => {
+		try {
+			await submit();
+			form.reset();
+		} catch (error) {
+			console.error(error);
+			submitError = true;
+		}
+	});
 </script>
 
-<div class="container">
+<main class="container">
 
 	<p>
 		certs.email is a simple tool for <span class="font-medium">automated SSL/TLS certificates monitoring</span>.
@@ -21,13 +36,20 @@
 		<li>Heartbeat reports with the status of your certificates every 2 weeks.</li>
 	</ul>
 
-	<form class="mt-10">
+	<form class="mt-10" {...enhancedSubmit}>
 		<label class="block">
 			<span class="font-medium">
 				Domain names:
 			</span>
 
-			<Textarea placeholder="Enter your domain names (one per line)" class="mt-2 w-full h-32 min-h-32" />
+			<Textarea placeholder="Enter your domain names (one per line)"
+								class="mt-2 w-full h-32 min-h-32"
+								{...domains.as('text')} />
+
+			<!-- eslint-disable-next-line svelte/require-each-key -->
+			{#each domains.issues() as issue}
+				<p class="text-red-600 mt-2">{issue.message}</p>
+			{/each}
 		</label>
 
 		<label class="block mt-6">
@@ -35,16 +57,31 @@
 				Email address:
 			</span>
 
-			<Input type="email" placeholder="Enter your email address" class="mt-2 block w-full" />
+			<Input placeholder="Enter your email address" class="mt-2 block w-full"
+						 {...email.as('email')} />
+
+			<!-- eslint-disable-next-line svelte/require-each-key -->
+			{#each email.issues() as issue}
+				<p class="text-red-600 mt-2">{issue.message}</p>
+			{/each}
 		</label>
 
-		<Button class="mt-6 w-full flex items-center justify-center gap-x-2">
+		<Button
+			class="mt-6 w-full flex items-center justify-center gap-x-2 {!!submit.pending && 'disabled:cursor-progress'}"
+			type="submit"
+			disabled={!!submit.pending}>
 			<CheckIcon class="size-4" />
 			Subscribe to notifications
 		</Button>
+
+		{#if submitError}
+			<p class="mt-4 text-red-600">
+				An unexpected error occurred while submitting your form. Please try again later.
+			</p>
+		{/if}
 	</form>
 
-	<h2 class="mt-14 text-blue-800 dark:text-blue-600 font-semibold tracking-wide text-3xl">
+	<h2 class="mt-14">
 		FAQ
 	</h2>
 
@@ -86,4 +123,4 @@
 		</p>
 	</FaqItem>
 
-</div>
+</main>

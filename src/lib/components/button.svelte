@@ -16,7 +16,9 @@
 							variant === 'primary' && 'bg-blue-800 text-white hover:bg-blue-900 hover:border-blue-900',
 							variant === 'secondary' && 'bg-white text-blue-800 hover:bg-blue-800 hover:border-blue-800 hover:text-white dark:bg-zinc-900 dark:text-white',
               "focus:outline-none focus:ring-3 focus:ring-blue-200 dark:focus:ring-blue-950 transition-shadow",
+							"disabled:opacity-50 disabled:cursor-not-allowed",
               buttonClass)}
+				type="button"
 				{...restProps}>
 	{@render children()}
 </button>

@@ -7,6 +7,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { ModeWatcher } from 'mode-watcher';
 	import { userPrefersMode } from 'mode-watcher';
+	import { resolve } from '$app/paths';
 
 	let { children } = $props();
 </script>
@@ -21,7 +22,10 @@
 <div class="container py-8">
 
 	<h1 class="text-blue-800 dark:text-blue-600 font-semibold tracking-wide text-4xl">
-		certs.email
+		<a href={resolve('/')}
+			 class="hover:underline underline-offset-4 decoration-2 decoration-blue-800 dark:decoration-blue-600">
+			certs.email
+		</a>
 	</h1>
 
 </div>

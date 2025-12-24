@@ -10,10 +10,18 @@
   @apply mx-auto max-w-4xl px-4;
 }
 
-@layer components {
+@layer base {
+  h2 {
+    @apply text-blue-800 dark:text-blue-600 font-semibold tracking-wide text-3xl;
+  }
+
   article {
     a {
       @apply underline underline-offset-4 decoration-2 decoration-blue-800 hover:text-blue-800 dark:decoration-blue-600 dark:hover:text-blue-600;
     }
   }
+}
+
+@layer components {
+
 }
