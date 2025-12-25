@@ -10,10 +10,9 @@
 
 	let submitError = false;
 
-	const enhancedSubmit = submit.enhance(async ({ form, submit }) => {
+	const enhancedSubmit = submit.enhance(async ({ submit }) => {
 		try {
 			await submit();
-			form.reset();
 		} catch (error) {
 			console.error(error);
 			submitError = true;
@@ -44,6 +43,7 @@
 
 			<Textarea placeholder="Enter your domain names (one per line)"
 								class="mt-2 w-full h-32 min-h-32"
+								required
 								{...domains.as('text')} />
 
 			<!-- eslint-disable-next-line svelte/require-each-key -->
@@ -58,6 +58,7 @@
 			</span>
 
 			<Input placeholder="Enter your email address" class="mt-2 block w-full"
+						 required
 						 {...email.as('email')} />
 
 			<!-- eslint-disable-next-line svelte/require-each-key -->
@@ -107,11 +108,11 @@
 	<FaqItem title="Can I trust you?">
 		<p>
 			certs.email is made by <a href="https://dmarcwise.io" target="_blank">DMARCwise</a>,
-			a DMARC monitoring product based in the European Union and used by thousands of companies.
+			a DMARC monitoring product built and hosted in the European Union and used by thousands of companies.
 		</p>
 
 		<p>
-			Your email address is safe and used only to send you the notifications.
+			Your email address is safe and is used only to send you the notifications.
 		</p>
 	</FaqItem>
 
