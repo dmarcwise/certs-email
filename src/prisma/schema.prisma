@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @db.Timestamptz
+  email     String   @unique
+  confirmed Boolean
+
+  domains Domain[]
+
+  @@map("users")
+}
+
+model Domain {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name           String
+  port           Int?
+  createdAt      DateTime     @default(now()) @db.Timestamptz
+  lastCheckedAt  DateTime?    @db.Timestamptz
+  lastNotifiedAt DateTime?    @db.Timestamptz
+  notBefore      DateTime?    @db.Timestamptz
+  notAfter       DateTime?    @db.Timestamptz
+  status         DomainStatus
+  error          String?
+  errorStartedAt DateTime?    @db.Timestamptz
+
+  issuer      String?
+  cn          String? // Common Name
+  san         String[] // Subject Alternative Names
+  serial      String?
+  fingerprint String? // SHA256
+  ip          String?
+
+  checks Check[]
+
+  @@unique([userId, name, port])
+  @@map("domains")
+}
+
+enum DomainStatus {
+  OK
+  EXPIRING_30DAYS
+  EXPIRING_14DAYS
+  EXPIRING_7DAYS
+  EXPIRING_1DAY
+  EXPIRED
+}
+
+model Check {
+  id Int @id @default(autoincrement())
+
+  domainId Int
+  domain   Domain @relation(fields: [domainId], references: [id], onDelete: Cascade)
+
+  checkedAt DateTime @default(now()) @db.Timestamptz
+  error     String?
+
+  notBefore   DateTime? @db.Timestamptz
+  notAfter    DateTime? @db.Timestamptz
+  issuer      String?
+  cn          String? // Common Name
+  san         String[] // Subject Alternative Names
+  serial      String?
+  fingerprint String? // SHA256
+  ip          String?
+
+  @@map("checks")
+}
