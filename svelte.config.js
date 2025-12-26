@@ -9,6 +9,9 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
+		alias: {
+			$templates: 'src/templates'
+		},
 		experimental: {
 			remoteFunctions: true
 		}

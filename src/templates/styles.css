@@ -1,0 +1,51 @@
+body {
+  /*
+    Menlo -> macOS
+    DejaVu Sans Mono -> Linux
+    Roboto Mono -> Android
+    Lucida Sans Typewriter -> Windows
+  */
+  font-family: Menlo, 'DejaVu Sans Mono', 'Roboto Mono', 'Lucida Sans Typewriter', monospace;
+  font-size: 13px;
+  padding: 20px;
+  background: #f5f5f5;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+a {
+  color: #000000;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
+  text-decoration-color: #1e40af;
+}
+
+.button {
+  display: inline-block;
+  margin: 20px 0;
+  padding: 10px 24px;
+  background: #1e40af;
+  color: white !important;
+  text-decoration: none !important;
+  font-weight: bold;
+}
+
+.footer {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 0;
+  font-size: 12px;
+  color: #666;
+}
