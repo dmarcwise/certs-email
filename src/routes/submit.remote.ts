@@ -91,28 +91,25 @@ export const submit = form(
 					status: DomainStatus.PENDING
 				}))
 			});
+		}
 
-			// Generate new confirmation token if user is existing and adding new domains
-			if (!isNewUser) {
-				const { token, expiresAt } = createConfirmationToken();
+		// Generate new confirmation token if user is existing and adding new domains
+		if (!isNewUser) {
+			const { token, expiresAt } = createConfirmationToken();
 
-				user = await db.user.update({
-					where: { id: user.id },
-					data: {
-						confirmToken: token,
-						confirmTokenExpiresAt: expiresAt
-					},
-					include: { domains: true }
-				});
-			}
+			user = await db.user.update({
+				where: { id: user.id },
+				data: {
+					confirmToken: token,
+					confirmTokenExpiresAt: expiresAt
+				},
+				include: { domains: true }
+			});
+		}
 
-			// Send confirmation email
-			if (user.confirmToken) {
-				await sendConfirmationEmail(email, user.confirmToken);
-			}
-		} else {
-			// TODO: if the confirmation fails/expires, the user has no way to confirm the domains
-			invalid(issue.domains('All submitted domains are already being monitored'));
+		// Send confirmation email
+		if (user.confirmToken) {
+			await sendConfirmationEmail(email, user.confirmToken);
 		}
 
 		redirect(303, '/success');
