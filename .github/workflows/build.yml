@@ -17,6 +17,8 @@ jobs:
           cache: 'npm'
       - name: Install npm dependencies
         run: npm ci
+      - name: Generate Prisma Client
+        run: npx prisma generate
       - name: Run Svelte checks
         run: npm run check
       - name: Build
