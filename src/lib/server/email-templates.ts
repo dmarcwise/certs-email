@@ -1,10 +1,12 @@
 import Handlebars from 'handlebars';
 import { inline } from '@css-inline/css-inline';
 import confirmationTemplate from '$templates/confirmation.hbs?raw';
+import confirmedDomainsTemplate from '$templates/confirmed-domains.hbs?raw';
 import commonStyles from '$templates/styles.css?raw';
 
 const templates: Record<string, string> = {
-	confirmation: confirmationTemplate
+	confirmation: confirmationTemplate,
+	confirmedDomains: confirmedDomainsTemplate
 };
 
 // Cache for compiled templates with inlined CSS
@@ -43,5 +45,15 @@ interface ConfirmationEmailData {
 
 export function renderConfirmationEmail(data: ConfirmationEmailData): string {
 	const template = loadTemplate('confirmation');
+	return template(data);
+}
+
+interface ConfirmedDomainsEmailData {
+	domains: string[];
+	settingsUrl: string;
+}
+
+export function renderConfirmedDomainsEmail(data: ConfirmedDomainsEmailData): string {
+	const template = loadTemplate('confirmedDomains');
 	return template(data);
 }

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="container">
+	<a href="https://certs.email" class="title">
+		certs.email
+	</a>
+	<br><br>
+
+	Your email has been verified! We're now monitoring SSL/TLS certificates for the following domains:
+	<br><br>
+
+	{{#each domains}}
+		● {{this}}
+		<br>
+	{{/each}}
+
+	<br>
+	You'll receive email notifications when any of your certificates are expiring.
+	<br><br>
+
+	Need to make changes? You can manage your monitored domains any time:
+	<br>
+
+	<a href="{{settingsUrl}}" class="button">
+		Manage domains
+	</a>
+</div>
+
+<div class="footer">
+	You're receiving this email because you confirmed your subscription to certificate monitoring on
+	<a href="https://certs.email">certs.email</a>.
+	<br><br>
+	<a href="{{settingsUrl}}">Manage your settings</a>.
+</div>
+</body>
+</html>

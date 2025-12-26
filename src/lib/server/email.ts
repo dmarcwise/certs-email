@@ -1,11 +1,13 @@
 import { env } from '$env/dynamic/private';
 import { MailtrapClient } from 'mailtrap';
 import { dev } from '$app/environment';
-import { renderConfirmationEmail } from './email-templates';
+import { renderConfirmationEmail, renderConfirmedDomainsEmail } from './email-templates';
 
 const mailtrap = new MailtrapClient({
 	token: env.MAILTRAP_API_KEY
 });
+
+const defaultFrom = { name: 'certs.email', email: 'support@certs.email' };
 
 export async function sendConfirmationEmail(to: string, confirmToken: string) {
 	const confirmUrl = `${env.WEBSITE_URL}/confirm?token=${confirmToken}`;
@@ -13,10 +15,28 @@ export async function sendConfirmationEmail(to: string, confirmToken: string) {
 	const html = renderConfirmationEmail({ confirmUrl });
 
 	await mailtrap.send({
-		from: { name: 'certs.email', email: 'support@certs.email' },
+		from: defaultFrom,
 		to: [{ email: to }],
 		subject: 'Confirm your certs.email subscription',
 		html,
 		category: dev ? 'DEV-CERTS-Confirmation' : 'PROD-CERTS-Confirmation'
+	});
+}
+
+export async function sendConfirmedDomainsEmail(
+	to: string,
+	domains: string[],
+	settingsToken: string
+) {
+	const settingsUrl = `${env.WEBSITE_URL}/settings?token=${settingsToken}`;
+
+	const html = renderConfirmedDomainsEmail({ domains, settingsUrl });
+
+	await mailtrap.send({
+		from: defaultFrom,
+		to: [{ email: to }],
+		subject: 'Your domains are now being monitored',
+		html,
+		category: dev ? 'DEV-CERTS-Confirmed' : 'PROD-CERTS-Confirmed'
 	});
 }
