@@ -111,11 +111,9 @@
 
 	<FaqItem title="Can I trust you?">
 		<p>
-			certs.email is made by <a href="https://dmarcwise.io" target="_blank">DMARCwise</a>,
-			a DMARC monitoring product built and hosted in the European Union and used by thousands of companies.
-		</p>
-
-		<p>
+			certs.email is made by the creators of <a href="https://dmarcwise.io" target="_blank">DMARCwise</a>,
+			a DMARC monitoring product used by thousands of companies.
+			<br>
 			Your email address is safe and is used only to send you the notifications.
 		</p>
 	</FaqItem>

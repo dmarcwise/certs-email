@@ -9,7 +9,6 @@
 	<div class="mt-8 flex flex-col sm:flex-row gap-x-4 gap-y-8">
 		<div class="flex flex-col gap-y-1">
 			<div>
-				Made by
 				<a href="https://dmarcwise.io" target="_blank">
 					DMARCwise
 				</a>
