@@ -1,5 +1,5 @@
 import Handlebars from 'handlebars';
-import { inline } from '@css-inline/css-inline';
+import juice from 'juice';
 import confirmationTemplate from '$templates/confirmation.hbs?raw';
 import confirmedDomainsTemplate from '$templates/confirmed-domains.hbs?raw';
 import heartbeatTemplate from '$templates/heartbeat.hbs?raw';
@@ -25,8 +25,8 @@ function loadTemplate(name: string): HandlebarsTemplateDelegate {
 	}
 
 	// Inline CSS using css-inline with common styles injected
-	let inlinedHtml = inline(templateHtml, {
-		extraCss: commonStyles,
+	let inlinedHtml = juice(templateHtml, {
+		extraCss: commonStyles
 	});
 
 	// Remove class attributes since styles are now inlined
