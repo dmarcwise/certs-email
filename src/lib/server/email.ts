@@ -1,10 +1,12 @@
 import { env } from '$env/dynamic/private';
 import { MailtrapClient } from 'mailtrap';
-import { dev } from '$app/environment';
+import { building, dev } from '$app/environment';
 import { renderConfirmationEmail, renderConfirmedDomainsEmail } from './email-templates';
 
+if (!building && !env.MAILTRAP_API_KEY) throw new Error('MAILTRAP_API_KEY is not set');
+
 const mailtrap = new MailtrapClient({
-	token: env.MAILTRAP_API_KEY
+	token: env.MAILTRAP_API_KEY!
 });
 
 const defaultFrom = { name: 'certs.email', email: 'support@certs.email' };
