@@ -15,7 +15,7 @@
 				</a>
 			</div>
 
-			<div class="mt-2 text-zinc-600 flex items-center gap-x-3 leading-tight">
+			<div class="mt-2 text-zinc-600 dark:text-zinc-400 flex items-center gap-x-3 leading-tight">
 				<img
 					src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1599px-Flag_of_Europe.svg.png?20081021155534"
 					class="w-8 rounded" alt="EU flag" />
@@ -23,7 +23,7 @@
 				Proudly made and hosted in the European Union
 			</div>
 
-			<div class="text-zinc-600 flex items-center gap-x-3 leading-tight mt-1">
+			<div class="text-zinc-600 dark:text-zinc-400 flex items-center gap-x-3 leading-tight mt-1">
 				<span class="w-8 aspect-[1.5] bg-green-100 rounded-md text-green-700 flex items-center justify-center">
 					<SproutIcon class="size-4" />
 				</span>
