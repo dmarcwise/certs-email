@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Heartbeat report</title>
+</head>
+<body>
+<div class="container">
+	<a href="https://certs.email" class="title">
+		certs.email
+	</a>
+	<br>
+	Heartbeat report - Generated on {{generatedDate}}
+	<br><br>
+
+	{{#if critical.length}}
+		<span class="section-title">CRITICAL (expires in ≤7 days):</span><br>
+		<br>
+		{{#each critical}}
+			<span class="critical">● {{domain}}</span><br>
+			Expires: {{expiresIn}} ({{expiresDate}})<br>
+			Issuer: {{issuer}}<br>
+			<br>
+		{{/each}}
+	{{/if}}
+
+	{{#if warning.length}}
+		<span class="section-title">WARNING (expires in ≤30 days):</span><br>
+		<br>
+		{{#each warning}}
+			<span class="warning">● {{domain}}</span><br>
+			Expires: {{expiresIn}} ({{expiresDate}})<br>
+			Issuer: {{issuer}}<br>
+			<br>
+		{{/each}}
+	{{/if}}
+
+	{{#if healthy.length}}
+		<span class="section-title">HEALTHY:</span><br>
+		<br>
+		{{#each healthy}}
+			<span class="healthy">● {{domain}}</span><br>
+			Expires: {{expiresIn}} ({{expiresDate}})<br>
+			Issuer: {{issuer}}<br>
+			<br>
+		{{/each}}
+	{{/if}}
+
+	<span class="section-title">SUMMARY:</span><br>
+	Total domains monitored: {{totalDomains}}
+</div>
+
+<div class="footer">
+	You're receiving this email because you've subscribed to certificate expiration notifications on
+	<a href="https://certs.email">certs.email</a>.
+	<br><br>
+	<a href="{{settingsUrl}}">Click here</a> to unsubscribe or change your settings.
+</div>
+</body>
+</html>

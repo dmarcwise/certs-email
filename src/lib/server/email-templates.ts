@@ -2,11 +2,13 @@ import Handlebars from 'handlebars';
 import { inline } from '@css-inline/css-inline';
 import confirmationTemplate from '$templates/confirmation.hbs?raw';
 import confirmedDomainsTemplate from '$templates/confirmed-domains.hbs?raw';
+import heartbeatTemplate from '$templates/heartbeat.hbs?raw';
 import commonStyles from '$templates/styles.css?raw';
 
 const templates: Record<string, string> = {
 	confirmation: confirmationTemplate,
-	confirmedDomains: confirmedDomainsTemplate
+	confirmedDomains: confirmedDomainsTemplate,
+	heartbeat: heartbeatTemplate
 };
 
 // Cache for compiled templates with inlined CSS
@@ -57,3 +59,26 @@ export function renderConfirmedDomainsEmail(data: ConfirmedDomainsEmailData): st
 	const template = loadTemplate('confirmedDomains');
 	return template(data);
 }
+
+interface DomainInfo {
+	domain: string;
+	expiresIn: string;
+	expiresDate: string;
+	issuer: string;
+}
+
+interface HeartbeatEmailData {
+	generatedDate: string;
+	critical: DomainInfo[];
+	warning: DomainInfo[];
+	healthy: DomainInfo[];
+	totalDomains: number;
+	settingsUrl: string;
+}
+
+export function renderHeartbeatEmail(data: HeartbeatEmailData): string {
+	const template = loadTemplate('heartbeat');
+	return template(data);
+}
+
+export type { HeartbeatEmailData, DomainInfo };
