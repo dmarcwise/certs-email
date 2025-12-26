@@ -5,6 +5,7 @@
 	import { CheckIcon } from '@lucide/svelte';
 	import FaqItem from './faq-item.svelte';
 	import { submit } from './submit.remote';
+	import { resolve } from '$app/paths';
 
 	const { domains, email } = submit.fields;
 
@@ -32,7 +33,10 @@
 
 	<ul class="mt-2 list-disc list-inside">
 		<li>Expiration notifications 30 days, 14 days, 7 days and 1 day before the date.</li>
-		<li>Heartbeat reports with the status of your certificates every 2 weeks.</li>
+		<li>
+			Heartbeat reports with the status of your certificates every 2 weeks
+			(<a href={resolve('/preview/heartbeat')} class="link">preview</a>).
+		</li>
 	</ul>
 
 	<form class="mt-10" {...enhancedSubmit}>
