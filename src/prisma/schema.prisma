@@ -37,6 +37,7 @@ model Domain {
 
   name           String
   port           Int?
+  confirmed      Boolean      @default(false)
   createdAt      DateTime     @default(now()) @db.Timestamptz
   lastCheckedAt  DateTime?    @db.Timestamptz
   lastNotifiedAt DateTime?    @db.Timestamptz
@@ -60,6 +61,7 @@ model Domain {
 }
 
 enum DomainStatus {
+  PENDING
   OK
   EXPIRING_30DAYS
   EXPIRING_14DAYS

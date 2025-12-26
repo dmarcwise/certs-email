@@ -46,6 +46,7 @@
 		"@prisma/client": "^7.2.0",
 		"clsx": "^2.1.1",
 		"dotenv": "^17.2.3",
+		"mailtrap": "^4.4.0",
 		"mode-watcher": "^1.1.0",
 		"pg": "^8.16.3",
 		"tailwind-merge": "^3.4.0",

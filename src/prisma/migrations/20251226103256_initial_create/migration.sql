@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "domain_status" AS ENUM ('OK', 'EXPIRING_30DAYS', 'EXPIRING_14DAYS', 'EXPIRING_7DAYS', 'EXPIRING_1DAY', 'EXPIRED');
+CREATE TYPE "domain_status" AS ENUM ('PENDING', 'OK', 'EXPIRING_30DAYS', 'EXPIRING_14DAYS', 'EXPIRING_7DAYS', 'EXPIRING_1DAY', 'EXPIRED');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -21,6 +21,7 @@ CREATE TABLE "domains" (
     "userId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "port" INTEGER,
+    "confirmed" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "lastCheckedAt" TIMESTAMPTZ,
     "lastNotifiedAt" TIMESTAMPTZ,

@@ -1,10 +1,16 @@
 import { form } from '$app/server';
 import { z } from 'zod';
 import { invalid, redirect } from '@sveltejs/kit';
+import { db } from '$lib/server/db';
+import { createConfirmationToken, generateToken } from '$lib/server/utils';
+import { sendConfirmationEmail } from '$lib/server/email';
+import { DomainStatus } from '../prisma/generated/enums';
 
 const domainRegex = new RegExp(
 	'^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$'
 );
+
+const MAX_DOMAINS_PER_USER = 20;
 
 export const submit = form(
 	z.object({
@@ -12,24 +18,102 @@ export const submit = form(
 		email: z.email()
 	}),
 	async ({ domains, email }, issue) => {
-		console.log(domains, email);
+		// Parse and validate domains
+		const sanitizedDomains = domains
+			.split('\n')
+			.map((domain) => domain.trim().toLowerCase())
+			.filter((domain) => domain.length > 0);
 
-		const sanitizedDomains = domains.split('\n').map((domain) => domain.trim());
 		if (sanitizedDomains.length === 0) {
 			invalid(issue.domains('Enter at least one valid domain'));
 		}
 
 		for (const domain of sanitizedDomains) {
-			if (!domain) {
-				continue;
-			}
-
 			if (!domainRegex.test(domain)) {
 				invalid(issue.domains(`Invalid domain: ${domain}`));
 			}
 		}
 
 		email = email.trim().toLowerCase();
+
+		// Find or create user
+		let user = await db.user.findUnique({
+			where: { email },
+			include: { domains: true }
+		});
+
+		const isNewUser = !user;
+
+		if (!user) {
+			// Create new user with tokens
+			const { token, expiresAt } = createConfirmationToken();
+			const settingsToken = generateToken();
+
+			user = await db.user.create({
+				data: {
+					email,
+					confirmed: false,
+					confirmToken: token,
+					confirmTokenExpiresAt: expiresAt,
+					settingsToken,
+					sendHeartbeatReport: true
+				},
+				include: { domains: true }
+			});
+		}
+
+		// Check domain limit
+		const currentDomainCount = user.domains.length;
+		const newDomainCount = sanitizedDomains.length;
+
+		if (currentDomainCount + newDomainCount > MAX_DOMAINS_PER_USER) {
+			const remaining = MAX_DOMAINS_PER_USER - currentDomainCount;
+			invalid(
+				issue.domains(
+					`You can only monitor up to ${MAX_DOMAINS_PER_USER} domains. You currently have ${currentDomainCount} domain(s), so you can add ${remaining} more.`
+				)
+			);
+		}
+
+		// Extract new domains to create
+		const existingDomainNames = new Set(user.domains.map((d) => d.name));
+		const domainsToCreate = sanitizedDomains.filter((name) => !existingDomainNames.has(name));
+
+		if (domainsToCreate.length > 0) {
+			const userId = user.id;
+
+			// Create new domains as unconfirmed
+			await db.domain.createMany({
+				data: domainsToCreate.map((name) => ({
+					userId,
+					name,
+					confirmed: false, // Requires email confirmation
+					status: DomainStatus.PENDING
+				}))
+			});
+
+			// Generate new confirmation token if user is existing and adding new domains
+			if (!isNewUser) {
+				const { token, expiresAt } = createConfirmationToken();
+
+				user = await db.user.update({
+					where: { id: user.id },
+					data: {
+						confirmToken: token,
+						confirmTokenExpiresAt: expiresAt
+					},
+					include: { domains: true }
+				});
+			}
+
+			// Send confirmation email
+			if (user.confirmToken) {
+				await sendConfirmationEmail(email, user.confirmToken);
+			}
+		} else {
+			// TODO: if the confirmation fails/expires, the user has no way to confirm the domains
+			invalid(issue.domains('All submitted domains are already being monitored'));
+		}
 
 		redirect(303, '/success');
 	}

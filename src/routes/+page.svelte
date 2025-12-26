@@ -101,7 +101,7 @@
 
 	<FaqItem title="Is certs.email free?">
 		<p>
-			Yes! certs.email is free and allows up to 25 domains per email address.
+			Yes! certs.email is free and allows up to 20 domains per email address.
 		</p>
 	</FaqItem>
 
