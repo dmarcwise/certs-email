@@ -19,6 +19,12 @@ model User {
   email     String   @unique
   confirmed Boolean
 
+  confirmToken          String?   @unique
+  confirmTokenExpiresAt DateTime? @db.Timestamptz
+  settingsToken         String    @unique
+
+  sendHeartbeatReport Boolean
+
   domains Domain[]
 
   @@map("users")
@@ -60,6 +66,8 @@ enum DomainStatus {
   EXPIRING_7DAYS
   EXPIRING_1DAY
   EXPIRED
+
+  @@map("domain_status")
 }
 
 model Check {

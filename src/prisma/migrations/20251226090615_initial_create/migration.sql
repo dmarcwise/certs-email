@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "DomainStatus" AS ENUM ('OK', 'EXPIRING_30DAYS', 'EXPIRING_14DAYS', 'EXPIRING_7DAYS', 'EXPIRING_1DAY', 'EXPIRED');
+CREATE TYPE "domain_status" AS ENUM ('OK', 'EXPIRING_30DAYS', 'EXPIRING_14DAYS', 'EXPIRING_7DAYS', 'EXPIRING_1DAY', 'EXPIRED');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -7,6 +7,10 @@ CREATE TABLE "users" (
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "email" TEXT NOT NULL,
     "confirmed" BOOLEAN NOT NULL,
+    "confirmToken" TEXT,
+    "confirmTokenExpiresAt" TIMESTAMPTZ,
+    "settingsToken" TEXT NOT NULL,
+    "sendHeartbeatReport" BOOLEAN NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -22,7 +26,7 @@ CREATE TABLE "domains" (
     "lastNotifiedAt" TIMESTAMPTZ,
     "notBefore" TIMESTAMPTZ,
     "notAfter" TIMESTAMPTZ,
-    "status" "DomainStatus" NOT NULL,
+    "status" "domain_status" NOT NULL,
     "error" TEXT,
     "errorStartedAt" TIMESTAMPTZ,
     "issuer" TEXT,
@@ -55,6 +59,12 @@ CREATE TABLE "checks" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_confirmToken_key" ON "users"("confirmToken");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_settingsToken_key" ON "users"("settingsToken");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "domains_userId_name_port_key" ON "domains"("userId", "name", "port");
