@@ -9,6 +9,13 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 export const db =
 	globalForPrisma.prisma ??
-	new PrismaClient({ adapter: new PrismaPg({ connectionString: env.DATABASE_URL }) });
+	new PrismaClient({
+		adapter: new PrismaPg({
+			connectionString: env.DATABASE_URL,
+			ssl: {
+				rejectUnauthorized: false
+			}
+		})
+	});
 
 if (dev) globalForPrisma.prisma = db;
