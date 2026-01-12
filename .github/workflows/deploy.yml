@@ -48,8 +48,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p ~/.ssh
-          echo "${{ vars.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          echo "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           echo "${{ secrets.DEPLOY_PRIVATE_KEY }}" > ~/.ssh/key
+          echo "${{ secrets.SSH_CONFIG }}" > ~/.ssh/config
           chmod 600 ~/.ssh/*
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
