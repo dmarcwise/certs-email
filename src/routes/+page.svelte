@@ -74,6 +74,11 @@
 			{/each}
 		</label>
 
+		<p class="mt-6 text-sm text-zinc-600 dark:text-zinc-400">
+			By continuing, you confirm that you have read our <a href={resolve('/privacy-policy')} class="link">Privacy
+			Policy</a>.
+		</p>
+
 		<Button
 			class="mt-6 w-full flex items-center justify-center gap-x-2 {!!submit.pending && 'disabled:cursor-progress'}"
 			type="submit"
@@ -117,7 +122,8 @@
 			certs.email is made by the creators of <a href="https://dmarcwise.io" target="_blank">DMARCwise</a>,
 			a DMARC monitoring product used by thousands of companies.
 			<br>
-			Your email address is safe and is used only to send you the notifications.
+			Your email address is safe and is used only to send you the notifications. Read our privacy policy <a
+			href={resolve('/privacy-policy')}>here</a>.
 		</p>
 	</FaqItem>
 
