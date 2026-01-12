@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  certs-email:
+    image: ${DOCKER_IMAGE}
+    environment:
+      - WEBSITE_URL
+      - DATABASE_URL
+      - MAILTRAP_API_KEY
+    networks:
+      - dmw
+    # Container labels
+    labels:
+      - "dmw.collect-logs=true"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.dmw-allow-certs-email == true
+      update_config:
+        order: start-first
+        failure_action: rollback
+      # Service labels
+#      labels:
+#        - "prometheus.scrape=true"
+#        - "prometheus.port=8080"
+
+networks:
+  dmw:
+    external: true

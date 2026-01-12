@@ -1,0 +1,78 @@
+name: Deploy
+run-name: Deploy to ${{ inputs.deploy_target }} (${{ github.sha }})
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: 'Deploy target'
+        required: true
+        default: 'PROD'
+        type: choice
+        options:
+          - PROD
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  PROD-build-and-push:
+    name: '[PROD] Build and push'
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    if: inputs.deploy_target == 'PROD'
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::238568159433:role/dmw-github-actions
+          aws-region: eu-central-1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          file: Dockerfile
+          push: true
+          tags: "${{ steps.login-ecr.outputs.registry }}/certs-email:${{ github.sha }}"
+  PROD-deploy:
+    name: '[PROD] Deploy'
+    runs-on: ubuntu-latest
+    if: inputs.deploy_target == 'PROD'
+    needs: PROD-build-and-push
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Prepare deploy
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          echo "${{ vars.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          echo "${{ secrets.DEPLOY_PRIVATE_KEY }}" > ~/.ssh/key
+          chmod 600 ~/.ssh/*
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::238568159433:role/dmw-github-actions
+          aws-region: eu-central-1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Deploy
+        env:
+          SERVER: dmw-prod-1
+          COMPOSE_SOURCE_PATH: docker-compose.yml
+          COMPOSE_DESTINATION_PATH: /tmp/certs-email.yml
+        run: |
+          set -euo pipefail
+          export DOCKER_REGISTRY_TOKEN=$(aws ecr get-login-password)
+          scp -i ~/.ssh/key $COMPOSE_SOURCE_PATH $SERVER:$COMPOSE_DESTINATION_PATH
+          ssh $SERVER \
+            -i ~/.ssh/key \
+            COMPOSE_FILE_PATH=$COMPOSE_DESTINATION_PATH \
+            OP_CONNECT_TOKEN=${{ secrets.OP_CONNECT_TOKEN }} \
+            DOCKER_REGISTRY_NAME=${{ steps.login-ecr.outputs.registry }} \
+            DOCKER_REGISTRY_TOKEN=$DOCKER_REGISTRY_TOKEN \
+            DOCKER_IMAGE=${{ steps.login-ecr.outputs.registry }}/certs-email:${{ github.sha }} \
+            'bash -s' < .github/workflows/deploy.sh
