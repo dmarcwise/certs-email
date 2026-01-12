@@ -24,6 +24,7 @@ model User {
   settingsToken         String    @unique
 
   sendHeartbeatReport Boolean
+  lastHeartbeatSentAt DateTime? @db.Timestamptz
 
   domains Domain[]
 

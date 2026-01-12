@@ -12,3 +12,7 @@ This repository contains the full-stack frontend application:
 
 Verifying changes:
 - When you make a change, you should use `npm run check` to verify you didn't make mistakes.
+
+## Imports
+
+Properly use SvelteKit aliases like `$templates` and `$prisma` in imports.

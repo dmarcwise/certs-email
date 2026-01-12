@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../prisma/generated/client';
+import { PrismaClient } from '$prisma/generated/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { building, dev } from '$app/environment';
 import { env } from '$env/dynamic/private';

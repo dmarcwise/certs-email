@@ -32,7 +32,10 @@
 	</p>
 
 	<ul class="mt-2 list-disc list-inside">
-		<li>Expiration notifications 30 days, 14 days, 7 days and 1 day before the date.</li>
+		<li>
+			Expiration notifications 30 days, 14 days, 7 days and 1 day before the date
+			(<a href={resolve('/preview/expiring')} class="link">preview</a>).
+		</li>
 		<li>
 			Heartbeat reports with the status of your certificates every 2 weeks
 			(<a href={resolve('/preview/heartbeat')} class="link">preview</a>).
@@ -86,7 +89,7 @@
 		{/if}
 	</form>
 
-	<h2 class="mt-14">
+	<h2 class="mt-20">
 		FAQ
 	</h2>
 

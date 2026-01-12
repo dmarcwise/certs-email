@@ -2,22 +2,15 @@ import { error } from '@sveltejs/kit';
 import {
 	renderConfirmationEmail,
 	renderConfirmedDomainsEmail,
+	renderExpiringDomainEmail,
 	renderHeartbeatEmail
 } from '$lib/server/email-templates';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
+import { formatExpirationDate } from '$lib/server/utils';
 
 function formatDate(date: Date): string {
 	return date.toISOString().split('T')[0];
-}
-
-function formatExpiryDate(date: Date): string {
-	const year = date.getUTCFullYear();
-	const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-	const day = String(date.getUTCDate()).padStart(2, '0');
-	const hours = String(date.getUTCHours()).padStart(2, '0');
-	const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-	return `${year}-${month}-${day} ${hours}:${minutes} UTC`;
 }
 
 function daysFromNow(days: number): Date {
@@ -27,11 +20,11 @@ function daysFromNow(days: number): Date {
 }
 
 function makeCert(domain: string, days: number) {
-	const expiryDate = daysFromNow(days);
+	const expirationDate = daysFromNow(days);
 	return {
 		domain,
 		expiresIn: `in ${days} days`,
-		expiresDate: formatExpiryDate(expiryDate),
+		expiresDate: formatExpirationDate(expirationDate),
 		issuer: "Let's Encrypt"
 	};
 }
@@ -55,7 +48,16 @@ const previewData = {
 		],
 		totalDomains: 7,
 		settingsUrl: `${env.WEBSITE_URL}/settings?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
-	})
+	}),
+	expiring: {
+		domain: 'example.com',
+		statusLabel: 'EXPIRING IN 7 DAYS',
+		statusClass: 'critical',
+		expiresIn: 'in 7 days',
+		expiresDate: formatExpirationDate(daysFromNow(7)),
+		issuer: "Let's Encrypt",
+		settingsUrl: `${env.WEBSITE_URL}/settings?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
+	}
 };
 
 export const GET: RequestHandler = async ({ params }) => {
@@ -68,6 +70,8 @@ export const GET: RequestHandler = async ({ params }) => {
 		html = renderConfirmedDomainsEmail(previewData['confirmed-domains']);
 	} else if (template === 'heartbeat') {
 		html = renderHeartbeatEmail(previewData.heartbeat());
+	} else if (template === 'expiring') {
+		html = renderExpiringDomainEmail(previewData.expiring);
 	} else {
 		throw error(404, `Template '${template}' not found`);
 	}

@@ -10,7 +10,8 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		alias: {
-			$templates: 'src/templates'
+			$templates: 'src/templates',
+			$prisma: 'src/prisma'
 		},
 		experimental: {
 			remoteFunctions: true

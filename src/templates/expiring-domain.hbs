@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Certificate expiration notice</title>
+</head>
+<body>
+<div class="container">
+	<a href="https://certs.email" class="title">
+		certs.email
+	</a>
+	<br>
+	Your certificate for <span class="{{statusClass}}">{{domain}}</span> is <strong>{{statusLabel}}</strong>.
+	<br><br>
+	Expires: {{expiresIn}} ({{expiresDate}})
+	<br>
+	Issuer: {{issuer}}
+	<br><br>
+	<a href="{{settingsUrl}}">Manage settings</a>
+</div>
+
+<div class="footer">
+	You're receiving this email because you've subscribed to certificate expiration notifications on
+	<a href="https://certs.email">certs.email</a>.
+	<br><br>
+	<a href="{{settingsUrl}}">Click here</a> to unsubscribe or change your settings.
+</div>
+</body>
+</html>
