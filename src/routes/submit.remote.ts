@@ -23,12 +23,13 @@ export const submit = form(
 			.split('\n')
 			.map((domain) => domain.trim().toLowerCase())
 			.filter((domain) => domain.length > 0);
+		const uniqueDomains = [...new Set(sanitizedDomains)];
 
-		if (sanitizedDomains.length === 0) {
+		if (uniqueDomains.length === 0) {
 			invalid(issue.domains('Enter at least one valid domain'));
 		}
 
-		for (const domain of sanitizedDomains) {
+		for (const domain of uniqueDomains) {
 			if (!domainRegex.test(domain)) {
 				invalid(issue.domains(`Invalid domain: ${domain}`));
 			}
@@ -64,7 +65,7 @@ export const submit = form(
 
 		// Check domain limit
 		const currentDomainCount = user.domains.length;
-		const newDomainCount = sanitizedDomains.length;
+		const newDomainCount = uniqueDomains.length;
 
 		if (currentDomainCount + newDomainCount > MAX_DOMAINS_PER_USER) {
 			const remaining = MAX_DOMAINS_PER_USER - currentDomainCount;
@@ -77,7 +78,7 @@ export const submit = form(
 
 		// Extract new domains to create
 		const existingDomainNames = new Set(user.domains.map((d) => d.name));
-		const domainsToCreate = sanitizedDomains.filter((name) => !existingDomainNames.has(name));
+		const domainsToCreate = uniqueDomains.filter((name) => !existingDomainNames.has(name));
 
 		if (domainsToCreate.length > 0) {
 			const userId = user.id;
