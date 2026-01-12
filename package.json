@@ -13,7 +13,8 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
 		"generate-migration": "prisma migrate dev --create-only",
-		"migrate": "prisma migrate deploy"
+		"migrate": "prisma migrate deploy",
+		"check-updates": "npx npm-check -u"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
@@ -51,6 +52,8 @@
 		"mailtrap": "^4.4.0",
 		"mode-watcher": "^1.1.0",
 		"pg": "^8.16.3",
+		"pino": "^10.1.1",
+		"pino-pretty": "^13.1.1",
 		"tailwind-merge": "^3.4.0",
 		"zod": "^4.2.1"
 	}

@@ -3,6 +3,7 @@ import { db } from './db';
 import { CertFetchError, type CertificateInfo, fetchCertificate } from './fetch-cert';
 import { computeDomainStatus } from './status';
 import { sendExpiringDomainEmail, sendHeartbeatEmail } from './email';
+import { createLogger } from './logger';
 import { formatExpirationDate, formatExpiresIn } from '$lib/server/utils';
 
 const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
@@ -20,10 +21,12 @@ const NOTIFY_STATUSES = new Set<DomainStatus>([
 	DomainStatus.EXPIRED
 ]);
 
+const logger = createLogger('worker');
+
 type DomainWithUser = Prisma.DomainGetPayload<{ include: { user: true } }>;
 
 export function startWorker() {
-	console.info('[worker] starting background tasks');
+	logger.info('Starting background tasks');
 	scheduleLoop('checks', CHECK_INTERVAL_MS, runChecks);
 	scheduleLoop('heartbeat', HEARTBEAT_INTERVAL_MS, runHeartbeat);
 }
@@ -36,11 +39,12 @@ function scheduleLoop(name: string, intervalMs: number, task: () => Promise<void
 		running = true;
 
 		try {
-			console.info(`[worker:${name}] run started`);
+			logger.info(`Run started: ${name}`);
 			await task();
-			console.info(`[worker:${name}] run finished`);
+			logger.info(`Run finished: ${name}`);
 		} catch (error) {
-			console.error(`[worker:${name}] run failed`, error);
+			const err = error instanceof Error ? error : new Error(String(error));
+			logger.error(err, `Run failed: ${name}`);
 		} finally {
 			running = false;
 			setTimeout(run, intervalMs);
@@ -62,7 +66,7 @@ async function runChecks() {
 		include: { user: true }
 	});
 
-	console.info(`[worker:checks] ${domains.length} domains to process`);
+	logger.info(`Found ${domains.length} domains to process`);
 
 	for (let index = 0; index < domains.length; index += CONCURRENCY_LIMIT) {
 		const chunk = domains.slice(index, index + CONCURRENCY_LIMIT);
@@ -77,23 +81,31 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 	try {
 		cert = await fetchCertificate(domain.name, port);
 	} catch (error) {
-		const message = error instanceof CertFetchError ? error.message : 'Unknown error';
-		const errorStartedAt = domain.errorStartedAt ?? now;
-		console.warn(`[worker:checks] ${domain.name} failed: ${message}`);
+		let dbErrorMessage: string;
+		if (error instanceof CertFetchError) {
+			dbErrorMessage = error.message;
+			logger.warn(`[${domain.name}] Check failed: ${dbErrorMessage}`);
+		} else {
+			dbErrorMessage = 'Unknown error';
+			logger.error(
+				error,
+				`[${domain.name}] Unknown error while fetching certificate for domain, continuing`
+			);
+		}
 
 		await db.$transaction([
 			db.check.create({
 				data: {
 					domainId: domain.id,
-					error: message
+					error: dbErrorMessage
 				}
 			}),
 			db.domain.update({
 				where: { id: domain.id },
 				data: {
 					lastCheckedAt: now,
-					error: message,
-					errorStartedAt
+					error: dbErrorMessage,
+					errorStartedAt: domain.errorStartedAt ?? now
 				}
 			})
 		]);
@@ -102,12 +114,12 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 
 	const nextStatus = computeDomainStatus(cert.notAfter, now);
 	const shouldNotify = nextStatus !== domain.status && NOTIFY_STATUSES.has(nextStatus);
-	console.info(`[worker:checks] ${domain.name} -> ${nextStatus}`);
+	logger.info(`[${domain.name}] Status: ${nextStatus}`);
 
 	if (shouldNotify) {
 		const daysRemaining = Math.ceil((cert.notAfter.getTime() - now.getTime()) / 86_400_000);
-		console.info(
-			`[worker:notify] ${domain.name} -> ${nextStatus} (${daysRemaining} days remaining)`
+		logger.info(
+			`[${domain.name}] Sending notification for new status: ${nextStatus} (${daysRemaining} days remaining)`
 		);
 		await sendExpiringDomainEmail(domain.user.email, nextStatus, {
 			domain: domain.name,
@@ -159,7 +171,7 @@ async function runHeartbeat() {
 		include: { domains: { where: { confirmed: true } } }
 	});
 
-	console.info(`[worker:heartbeat] ${users.length} users to consider`);
+	logger.info(`Found ${users.length} users to consider for heartbeat report`);
 
 	for (const user of users) {
 		if (user.domains.length === 0) {
@@ -202,7 +214,7 @@ async function runHeartbeat() {
 
 		const healthy = domainInfo.filter((domain) => domain.status === DomainStatus.OK);
 
-		console.info(`[worker:heartbeat] sending report to ${user.email}`);
+		logger.info(`Sending heartbet report to user ${user.email}`);
 
 		await sendHeartbeatEmail(user.email, {
 			generatedDate: now.toISOString().split('T')[0],
