@@ -28,4 +28,4 @@ RUN npm ci --omit=dev
 
 COPY --from=builder /app/build ./build
 
-CMD ["node", "build"]
+CMD ["sh", "-c", "npm run migrate && node build"]
