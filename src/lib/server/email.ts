@@ -18,21 +18,12 @@ const mailtrap = new MailtrapClient({
 
 const defaultFrom = { name: 'certs.email', email: 'support@certs.email' };
 
+export type ExpirationStatus = Exclude<DomainStatus, 'PENDING' | 'OK'>;
+
 const EXPIRATION_EMAIL_METADATA: Record<
-	DomainStatus,
+	ExpirationStatus,
 	{ label: string; className: string; subject: string }
 > = {
-	// TODO: do we actually notify pending?
-	[DomainStatus.PENDING]: {
-		label: 'PENDING',
-		className: 'warning',
-		subject: 'Certificate status pending'
-	},
-	[DomainStatus.OK]: {
-		label: 'OK',
-		className: 'healthy',
-		subject: 'Certificate is healthy'
-	},
 	[DomainStatus.EXPIRING_30DAYS]: {
 		label: 'EXPIRING IN 30 DAYS',
 		className: 'warning',
@@ -94,7 +85,7 @@ export async function sendConfirmedDomainsEmail(
 
 export async function sendExpiringDomainEmail(
 	to: string,
-	status: DomainStatus,
+	status: ExpirationStatus,
 	data: {
 		domain: string;
 		notAfter: Date;

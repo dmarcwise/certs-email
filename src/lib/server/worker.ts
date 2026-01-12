@@ -2,7 +2,7 @@ import { DomainStatus, type Prisma } from '$prisma/generated/client';
 import { db } from './db';
 import { CertFetchError, type CertificateInfo, fetchCertificate } from './fetch-cert';
 import { computeDomainStatus } from './status';
-import { sendExpiringDomainEmail, sendHeartbeatEmail } from './email';
+import { sendExpiringDomainEmail, sendHeartbeatEmail, type ExpirationStatus } from './email';
 import { createLogger } from './logger';
 import { formatExpirationDate, formatExpiresIn } from '$lib/server/utils';
 
@@ -141,7 +141,7 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 		logger.info(
 			`[${domain.name}] Sending notification for new status: ${nextStatus} (${daysRemaining} days remaining)`
 		);
-		await sendExpiringDomainEmail(domain.user.email, nextStatus, {
+		await sendExpiringDomainEmail(domain.user.email, nextStatus as ExpirationStatus, {
 			domain: domain.name,
 			notAfter: cert.notAfter,
 			issuer: cert.issuer,
