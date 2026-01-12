@@ -27,5 +27,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/build ./build
+COPY --from=builder /app/src/prisma ./src/prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 CMD ["sh", "-c", "npm run migrate && node build"]
