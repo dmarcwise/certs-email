@@ -86,6 +86,7 @@ export async function fetchCertificate(
 				host: hostname,
 				port,
 				servername: hostname,
+				rejectUnauthorized: false,
 				lookup
 			},
 			() => {
