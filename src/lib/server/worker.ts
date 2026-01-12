@@ -27,11 +27,31 @@ type DomainWithUser = Prisma.DomainGetPayload<{ include: { user: true } }>;
 
 export function startWorker() {
 	logger.info('Starting background tasks');
-	scheduleLoop('checks', CHECK_INTERVAL_MS, runChecks);
-	scheduleLoop('heartbeat', HEARTBEAT_INTERVAL_MS, runHeartbeat);
+
+	scheduleLoop(
+		runChecks,
+		CHECK_INTERVAL_MS,
+		() => logger.info('Starting domain checks run...'),
+		() => logger.info('Domain checks finished'),
+		(err) => logger.error(err, 'Domain checks run failed')
+	);
+
+	scheduleLoop(
+		runHeartbeat,
+		HEARTBEAT_INTERVAL_MS,
+		() => logger.info('Starting heartbeat report run...'),
+		() => logger.info('Heartbeat report finished'),
+		(err) => logger.error(err, 'Heartbeat report run failed')
+	);
 }
 
-function scheduleLoop(name: string, intervalMs: number, task: () => Promise<void>) {
+function scheduleLoop(
+	task: () => Promise<void>,
+	intervalMs: number,
+	onRunStart: () => void = () => {},
+	onRunFinish: () => void = () => {},
+	onRunFail: (error: Error) => void = () => {}
+) {
 	let running = false;
 
 	const run = async () => {
@@ -39,12 +59,12 @@ function scheduleLoop(name: string, intervalMs: number, task: () => Promise<void
 		running = true;
 
 		try {
-			logger.info(`Run started: ${name}`);
+			onRunStart();
 			await task();
-			logger.info(`Run finished: ${name}`);
+			onRunFinish();
 		} catch (error) {
 			const err = error instanceof Error ? error : new Error(String(error));
-			logger.error(err, `Run failed: ${name}`);
+			onRunFail(err);
 		} finally {
 			running = false;
 			setTimeout(run, intervalMs);
