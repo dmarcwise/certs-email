@@ -48,6 +48,7 @@
 		"clsx": "^2.1.1",
 		"dotenv": "^17.2.3",
 		"handlebars": "^4.7.8",
+		"ipaddr.js": "^2.2.0",
 		"juice": "^11.1.0",
 		"mailtrap": "^4.4.0",
 		"mode-watcher": "^1.1.0",

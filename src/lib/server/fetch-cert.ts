@@ -1,6 +1,6 @@
 import dns from 'node:dns';
 import tls, { type PeerCertificate } from 'node:tls';
-import { isPrivateIPv4 } from '$lib/server/utils';
+import { isValidGlobalIPv4 } from '$lib/server/utils';
 
 const DEFAULT_TIMEOUT_MS = 10_000;
 
@@ -71,7 +71,7 @@ export async function fetchCertificate(
 					return;
 				}
 
-				const publicIp = addresses.find((address) => !isPrivateIPv4(address.address));
+				const publicIp = addresses.find((address) => isValidGlobalIPv4(address.address));
 				if (!publicIp) {
 					callback(new CertFetchError('DNS lookup returned no public IPv4 addresses'), '', 4);
 					return;

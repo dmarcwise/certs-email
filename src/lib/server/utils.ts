@@ -1,4 +1,5 @@
 import { randomBytes } from 'crypto';
+import ipaddr from 'ipaddr.js';
 import { DomainStatus } from '$prisma/generated/enums';
 
 const BASE62_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -38,16 +39,15 @@ export function formatExpiresIn(daysRemaining: number, status: DomainStatus): st
 	return `in ${daysRemaining} days`;
 }
 
-export function isPrivateIPv4(address: string): boolean {
-	const parts = address.split('.').map((part) => Number(part));
-	if (parts.length !== 4 || parts.some((part) => Number.isNaN(part))) {
+export function isValidGlobalIPv4(address: string): boolean {
+	if (!ipaddr.isValid(address)) {
 		return false;
 	}
 
-	const [first, second] = parts;
-	return (
-		first === 10 ||
-		(first === 172 && second >= 16 && second <= 31) ||
-		(first === 192 && second === 168)
-	);
+	const ip = ipaddr.parse(address);
+	if (ip.kind() !== 'ipv4') {
+		return false;
+	}
+
+	return ip.range() === 'unicast';
 }
