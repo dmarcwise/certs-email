@@ -4,7 +4,10 @@ import { invalid, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { createConfirmationToken, generateToken } from '$lib/server/utils';
 import { sendConfirmationEmail } from '$lib/server/email';
+import { createLogger } from '$lib/server/logger';
 import { DomainStatus } from '../prisma/generated/enums';
+
+const logger = createLogger('submit');
 
 const domainRegex = new RegExp(
 	'^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$'
@@ -24,6 +27,11 @@ export const submit = form(
 			.map((domain) => domain.trim().toLowerCase())
 			.filter((domain) => domain.length > 0);
 		const uniqueDomains = [...new Set(sanitizedDomains)];
+
+		logger.info(
+			{ email: email.trim().toLowerCase(), domainCount: uniqueDomains.length },
+			'New submission received'
+		);
 
 		if (uniqueDomains.length === 0) {
 			invalid(issue.domains('Enter at least one valid domain'));
@@ -110,6 +118,7 @@ export const submit = form(
 
 		// Send confirmation email
 		if (user.confirmToken) {
+			logger.info({ email }, 'Sending confirmation email');
 			await sendConfirmationEmail(email, user.confirmToken);
 		}
 

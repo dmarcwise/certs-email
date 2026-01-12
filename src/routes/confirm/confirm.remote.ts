@@ -3,6 +3,9 @@ import { z } from 'zod';
 import { invalid, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { sendConfirmedDomainsEmail } from '$lib/server/email';
+import { createLogger } from '$lib/server/logger';
+
+const logger = createLogger('confirm');
 
 export const confirm = form(
 	z.object({
@@ -52,6 +55,7 @@ export const confirm = form(
 
 		// Send email with confirmed domains list
 		if (confirmedUser) {
+			logger.info({ email: confirmedUser.email }, 'Sending confirmed domains list email');
 			await sendConfirmedDomainsEmail(
 				confirmedUser.email,
 				confirmedUser.domains.map((d) => d.name),
