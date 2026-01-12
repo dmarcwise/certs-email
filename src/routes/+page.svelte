@@ -129,4 +129,10 @@
 		</p>
 	</FaqItem>
 
+	<FaqItem title="Do you support multiple IPs?">
+		<p>
+			No, we currently only take the first public IPv4 address returned by the DNS lookup for the domain.
+		</p>
+	</FaqItem>
+
 </main>

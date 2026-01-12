@@ -37,3 +37,17 @@ export function formatExpiresIn(daysRemaining: number, status: DomainStatus): st
 	if (daysRemaining === 1) return 'in 1 day';
 	return `in ${daysRemaining} days`;
 }
+
+export function isPrivateIPv4(address: string): boolean {
+	const parts = address.split('.').map((part) => Number(part));
+	if (parts.length !== 4 || parts.some((part) => Number.isNaN(part))) {
+		return false;
+	}
+
+	const [first, second] = parts;
+	return (
+		first === 10 ||
+		(first === 172 && second >= 16 && second <= 31) ||
+		(first === 192 && second === 168)
+	);
+}

@@ -1,4 +1,6 @@
+import dns from 'node:dns';
 import tls, { type PeerCertificate } from 'node:tls';
+import { isPrivateIPv4 } from '$lib/server/utils';
 
 const DEFAULT_TIMEOUT_MS = 10_000;
 
@@ -54,15 +56,42 @@ export async function fetchCertificate(
 			reject(error);
 		};
 
+		const lookup = (
+			hostname: string,
+			_options: dns.LookupOptions,
+			callback: (
+				err: NodeJS.ErrnoException | null,
+				address: string | dns.LookupAddress[],
+				family?: number
+			) => void
+		) => {
+			dns.lookup(hostname, { family: 4, all: true }, (error, addresses) => {
+				if (error) {
+					callback(new CertFetchError('DNS lookup failed', error), '', 4);
+					return;
+				}
+
+				const publicIp = addresses.find((address) => !isPrivateIPv4(address.address));
+				if (!publicIp) {
+					callback(new CertFetchError('DNS lookup returned no public IPv4 addresses'), '', 4);
+					return;
+				}
+
+				callback(null, publicIp.address, publicIp.family);
+			});
+		};
+
 		const socket = tls.connect(
 			{
 				host: hostname,
 				port,
-				servername: hostname
+				servername: hostname,
+				lookup
 			},
 			() => {
 				let cert: PeerCertificate | undefined;
 				const remoteAddress = socket.remoteAddress;
+
 				try {
 					cert = socket.getPeerCertificate(false);
 				} catch (err) {
@@ -95,7 +124,11 @@ export async function fetchCertificate(
 		});
 
 		socket.once('error', (error) => {
-			rejectOnce(new CertFetchError('TLS connection failed', error));
+			const certError =
+				error instanceof CertFetchError
+					? error
+					: new CertFetchError('TLS connection failed', error);
+			rejectOnce(certError);
 		});
 	});
 }
