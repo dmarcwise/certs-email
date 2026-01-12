@@ -1,0 +1,12 @@
+.DS_Store
+.env
+.env.*
+.git
+.github
+.idea
+.vscode
+node_modules
+build
+.svelte-kit
+playground
+npm-debug.log
