@@ -2,14 +2,16 @@
 	import Button from '$lib/components/button.svelte';
 	import Input from '$lib/components/input.svelte';
 	import Textarea from '$lib/components/textarea.svelte';
-	import { CheckIcon } from '@lucide/svelte';
+	import { CheckIcon, CircleXIcon } from '@lucide/svelte';
 	import FaqItem from './faq-item.svelte';
 	import { submit } from './submit.remote';
+	import { unsubscribe } from './unsubscribe.remote';
 	import { resolve } from '$app/paths';
 
 	const { data } = $props();
 
 	const { domains, email, settingsToken } = submit.fields;
+	const { settingsToken: unsubscribeToken } = unsubscribe.fields;
 
 	if (data.edit) {
 		submit.fields.set({
@@ -17,9 +19,14 @@
 			email: data.edit.email,
 			settingsToken: data.edit.token
 		});
+
+		unsubscribe.fields.set({
+			settingsToken: data.edit.token
+		});
 	}
 
 	let submitError = $state(false);
+	let unsubscribeError = $state(false);
 
 	const enhancedSubmit = submit.enhance(async ({ submit }) => {
 		try {
@@ -27,6 +34,15 @@
 		} catch (error) {
 			console.error(error);
 			submitError = true;
+		}
+	});
+
+	const enhancedUnsubscribe = unsubscribe.enhance(async ({ submit }) => {
+		try {
+			await submit();
+		} catch (error) {
+			console.error(error);
+			unsubscribeError = true;
 		}
 	});
 </script>
@@ -133,9 +149,34 @@
 		{/if}
 	</form>
 
-	<h2 class="mt-20">
-		FAQ
-	</h2>
+	{#if data.edit}
+		<form class="mt-4" {...enhancedUnsubscribe}>
+			<input type="hidden" {...unsubscribeToken.as('text')} />
+
+			<Button
+				class="flex w-full items-center justify-center gap-x-2 {!!unsubscribe.pending &&'disabled:cursor-progress'}"
+				variant="danger"
+				type="submit"
+				disabled={!!unsubscribe.pending}
+			>
+				<CircleXIcon class="size-4" />
+				Unsubscribe from notifications
+			</Button>
+
+			<!-- eslint-disable-next-line svelte/require-each-key -->
+			{#each unsubscribeToken.issues() as issue}
+				<p class="mt-2 text-red-600">{issue.message}</p>
+			{/each}
+
+			{#if unsubscribeError}
+				<p class="mt-4 text-red-600">
+					An unexpected error occurred while unsubscribing. Please try again later.
+				</p>
+			{/if}
+		</form>
+	{/if}
+
+	<h2 class="mt-20">FAQ</h2>
 
 	<FaqItem title="Why would I use certs.email?">
 		<p>

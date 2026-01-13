@@ -13,6 +13,12 @@
 		{#if message === 'updated'}
 			<p class="mt-4 font-medium">Your monitoring settings have been updated.</p>
 			<p class="mt-2">We'll keep watching your domains and send alerts as usual.</p>
+		{:else if message === 'unsubscribed'}
+			<p class="mt-4 font-medium">You've been unsubscribed from certs.email.</p>
+			<p class="mt-2">
+				Your personal data has been deleted and we won't send any further notifications for your
+				domains.
+			</p>
 		{:else}
 			<p class="mt-4 font-medium">We've sent you a verification link via email.</p>
 			<p class="mt-2">Click on the link to confirm the subscription.</p>
