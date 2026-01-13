@@ -13,20 +13,35 @@
 	const { domains, email, settingsToken } = submit.fields;
 	const { settingsToken: unsubscribeToken } = unsubscribe.fields;
 
-	if (data.edit) {
-		submit.fields.set({
-			domains: data.edit.domains,
-			email: data.edit.email,
-			settingsToken: data.edit.token
-		});
-
-		unsubscribe.fields.set({
-			settingsToken: data.edit.token
-		});
-	}
-
 	let submitError = $state(false);
 	let unsubscribeError = $state(false);
+
+	$effect(() => {
+		if (data.edit) {
+			submit.fields.set({
+				domains: data.edit.domains,
+				email: data.edit.email,
+				settingsToken: data.edit.token
+			});
+
+			unsubscribe.fields.set({
+				settingsToken: data.edit.token
+			});
+		} else {
+			submit.fields.set({
+				domains: '',
+				email: '',
+				settingsToken: ''
+			});
+
+			unsubscribe.fields.set({
+				settingsToken: ''
+			});
+
+			submitError = false;
+			unsubscribeError = false;
+		}
+	});
 
 	const enhancedSubmit = submit.enhance(async ({ submit }) => {
 		try {
