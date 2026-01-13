@@ -93,3 +93,31 @@ model Check {
 
   @@map("checks")
 }
+
+enum EmailOutboxStatus {
+  Pending
+  Completed
+  Failed
+
+  @@map("email_outbox_status")
+}
+
+model EmailOutbox {
+  id Int @id @default(autoincrement())
+
+  createdAt      DateTime          @default(now()) @db.Timestamptz
+  sendAfter      DateTime?         @db.Timestamptz
+  completedAt    DateTime?         @db.Timestamptz
+  status         EmailOutboxStatus @default(Pending)
+  failedAttempts Int               @default(0)
+  retryAfter     DateTime?         @db.Timestamptz
+  priority       Int
+
+  recipients   String[]
+  replyTo      String?
+  subject      String
+  body         String
+  templateName String?
+
+  @@map("email_outbox")
+}

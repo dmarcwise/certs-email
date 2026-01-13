@@ -3,9 +3,11 @@ import { z } from 'zod';
 import { invalid, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { createConfirmationToken, generateToken } from '$lib/server/utils';
-import { sendConfirmationEmail } from '$lib/server/email';
+import { EmailOutboxPriorities } from '$lib/server/email';
 import { createLogger } from '$lib/server/logger';
-import { DomainStatus } from '../prisma/generated/enums';
+import { DomainStatus } from '$prisma/generated/enums';
+import { renderConfirmationEmail } from '$lib/server/email-templates';
+import { env } from '$env/dynamic/private';
 
 const logger = createLogger('submit');
 
@@ -118,10 +120,25 @@ export const submit = form(
 
 		// Send confirmation email
 		if (user.confirmToken) {
-			logger.info({ email }, 'Sending confirmation email');
-			await sendConfirmationEmail(email, user.confirmToken);
+			logger.info({ email }, `Queueing confirmation email for user ${email}`);
+			await queueConfirmationEmail(email, user.confirmToken);
 		}
 
 		redirect(303, '/success');
 	}
 );
+
+async function queueConfirmationEmail(to: string, confirmToken: string) {
+	const confirmUrl = `${env.WEBSITE_URL}/confirm?token=${confirmToken}`;
+	const html = renderConfirmationEmail({ confirmUrl });
+
+	await db.emailOutbox.create({
+		data: {
+			recipients: [to],
+			subject: 'Confirm your certs.email subscription',
+			body: html,
+			templateName: 'Confirmation',
+			priority: EmailOutboxPriorities.High
+		}
+	});
+}

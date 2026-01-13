@@ -1,14 +1,23 @@
-import { DomainStatus, type Prisma } from '$prisma/generated/client';
+import { DomainStatus, type EmailOutbox, Prisma } from '$prisma/generated/client';
 import { db } from './db';
 import { CertFetchError, type CertificateInfo, fetchCertificate } from './fetch-cert';
 import { computeDomainStatus } from './status';
-import { sendExpiringDomainEmail, sendHeartbeatEmail, type ExpirationStatus } from './email';
+import { sendQueuedEmail, EmailOutboxPriorities } from './email';
 import { createLogger } from './logger';
 import { formatExpirationDate, formatExpiresIn } from '$lib/server/utils';
+import { renderExpiringDomainEmail, renderHeartbeatEmail } from '$lib/server/email-templates';
+import { env } from '$env/dynamic/private';
 
 const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
+
 const HEARTBEAT_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const HEARTBEAT_PERIOD_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
+
+const EMAIL_OUTBOX_POLL_INTERVAL_MS = 10_000;
+const EMAIL_OUTBOX_BATCH_SIZE = 10;
+const EMAIL_OUTBOX_MAX_ATTEMPTS = 15;
+const EMAIL_OUTBOX_INITIAL_DELAY_MS = 10_000;
+const EMAIL_OUTBOX_MAX_DELAY_MS = 20 * 60 * 1000;
 
 // Domains to fetch at a time
 const CONCURRENCY_LIMIT = 3;
@@ -24,6 +33,38 @@ const NOTIFY_STATUSES = new Set<DomainStatus>([
 const logger = createLogger('worker');
 
 type DomainWithUser = Prisma.DomainGetPayload<{ include: { user: true } }>;
+type ExpirationStatus = Exclude<DomainStatus, 'PENDING' | 'OK'>;
+
+const EXPIRATION_EMAIL_METADATA: Record<
+	ExpirationStatus,
+	{ label: string; className: string; subject: string }
+> = {
+	[DomainStatus.EXPIRING_30DAYS]: {
+		label: 'EXPIRING IN 30 DAYS',
+		className: 'warning',
+		subject: 'Certificate expiring in 30 days'
+	},
+	[DomainStatus.EXPIRING_14DAYS]: {
+		label: 'EXPIRING IN 14 DAYS',
+		className: 'warning',
+		subject: 'Certificate expiring in 14 days'
+	},
+	[DomainStatus.EXPIRING_7DAYS]: {
+		label: 'EXPIRING IN 7 DAYS',
+		className: 'critical',
+		subject: 'Certificate expiring in 7 days'
+	},
+	[DomainStatus.EXPIRING_1DAY]: {
+		label: 'EXPIRING IN 1 DAY',
+		className: 'critical',
+		subject: 'Certificate expiring in 1 day'
+	},
+	[DomainStatus.EXPIRED]: {
+		label: 'EXPIRED',
+		className: 'critical',
+		subject: 'Certificate expired'
+	}
+};
 
 export function startWorker() {
 	logger.info('Starting background tasks');
@@ -42,6 +83,14 @@ export function startWorker() {
 		() => logger.info('Starting heartbeat report run...'),
 		() => logger.info('Heartbeat report finished'),
 		(err) => logger.error(err, 'Heartbeat report run failed')
+	);
+
+	scheduleLoop(
+		runEmailOutbox,
+		EMAIL_OUTBOX_POLL_INTERVAL_MS,
+		() => logger.debug('Checking email outbox...'),
+		() => logger.debug('Email outbox poll finished'),
+		(err) => logger.error(err, 'Email outbox poll failed')
 	);
 }
 
@@ -72,6 +121,84 @@ function scheduleLoop(
 	};
 
 	setTimeout(run, 0);
+}
+
+async function runEmailOutbox() {
+	const jobs = await db.emailOutbox.findMany({
+		where: {
+			status: 'Pending',
+			AND: [
+				{
+					OR: [{ sendAfter: null }, { sendAfter: { lte: new Date() } }]
+				},
+				{
+					OR: [{ retryAfter: null }, { retryAfter: { lte: new Date() } }]
+				}
+			]
+		},
+		orderBy: [{ priority: 'asc' }, { createdAt: 'asc' }],
+		take: EMAIL_OUTBOX_BATCH_SIZE
+	});
+
+	if (jobs.length === 0) {
+		return;
+	}
+
+	logger.info(`Processing ${jobs.length} queued emails`);
+
+	for (const job of jobs) {
+		await deliverEmailOutboxJob(job);
+	}
+}
+
+async function deliverEmailOutboxJob(job: EmailOutbox) {
+	logger.info(`Sending email ${job.id} to ${job.recipients.join(', ')}`);
+
+	try {
+		await sendQueuedEmail(job);
+
+		await db.emailOutbox.update({
+			where: { id: job.id },
+			data: {
+				status: 'Completed',
+				completedAt: new Date(),
+				retryAfter: null
+			}
+		});
+	} catch (error) {
+		const err = error instanceof Error ? error : new Error(String(error));
+		const nextAttempts = job.failedAttempts + 1;
+
+		if (nextAttempts >= EMAIL_OUTBOX_MAX_ATTEMPTS) {
+			await db.emailOutbox.update({
+				where: { id: job.id },
+				data: {
+					status: 'Failed',
+					failedAttempts: nextAttempts
+				}
+			});
+
+			logger.error(err, `Email outbox job ${job.id} failed permanently`);
+			return;
+		}
+
+		const exponentialDelayMs = Math.min(2 ** job.failedAttempts * 1000, EMAIL_OUTBOX_MAX_DELAY_MS);
+		const retryDelayMs = EMAIL_OUTBOX_INITIAL_DELAY_MS + exponentialDelayMs;
+		const retryAfter = new Date(Date.now() + retryDelayMs);
+
+		await db.emailOutbox.update({
+			where: { id: job.id },
+			data: {
+				failedAttempts: nextAttempts,
+				retryAfter
+			}
+		});
+
+		logger.warn(
+			err,
+			`Email outbox job ${job.id} failed; retrying in ${retryDelayMs / 1000} seconds`
+		);
+	}
 }
 
 async function runChecks() {
@@ -141,12 +268,14 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 		logger.info(
 			`[${domain.name}] Sending notification for new status: ${nextStatus} (${daysRemaining} days remaining)`
 		);
-		await sendExpiringDomainEmail(domain.user.email, nextStatus as ExpirationStatus, {
-			domain: domain.name,
-			notAfter: cert.notAfter,
-			issuer: cert.issuer,
-			settingsToken: domain.user.settingsToken
-		});
+		await queueExpiringDomainEmail(
+			domain.user.email,
+			nextStatus as ExpirationStatus,
+			domain.name,
+			cert.notAfter,
+			cert.issuer,
+			domain.user.settingsToken
+		);
 	}
 
 	await db.$transaction([
@@ -184,6 +313,39 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 	]);
 }
 
+async function queueExpiringDomainEmail(
+	to: string,
+	status: ExpirationStatus,
+	domain: string,
+	notAfter: Date,
+	issuer: string | null,
+	settingsToken: string
+) {
+	const metadata = EXPIRATION_EMAIL_METADATA[status];
+	const settingsUrl = `${env.WEBSITE_URL}/settings?token=${settingsToken}`;
+	const daysRemaining = Math.ceil((notAfter.getTime() - Date.now()) / 86_400_000);
+
+	const html = renderExpiringDomainEmail({
+		domain,
+		statusLabel: metadata.label,
+		statusClass: metadata.className,
+		expiresIn: formatExpiresIn(daysRemaining, status),
+		expiresDate: formatExpirationDate(notAfter),
+		issuer: issuer ?? 'Unknown',
+		settingsUrl
+	});
+
+	await db.emailOutbox.create({
+		data: {
+			recipients: [to],
+			subject: `${metadata.subject}: ${domain}`,
+			body: html,
+			templateName: 'Expiring',
+			priority: EmailOutboxPriorities.Medium
+		}
+	});
+}
+
 async function runHeartbeat() {
 	const now = new Date();
 	const users = await db.user.findMany({
@@ -203,7 +365,6 @@ async function runHeartbeat() {
 			continue;
 		}
 
-		const settingsToken = user.settingsToken;
 		const domainInfo = user.domains
 			.filter((domain) => domain.notAfter)
 			.map((domain) => {
@@ -236,18 +397,49 @@ async function runHeartbeat() {
 
 		logger.info(`Sending heartbet report to user ${user.email}`);
 
-		await sendHeartbeatEmail(user.email, {
-			generatedDate: now.toISOString().split('T')[0],
+		await queueHeartbeatEmail(
+			user.email,
+			now.toISOString().split('T')[0],
 			critical,
 			warning,
 			healthy,
-			totalDomains: user.domains.length,
-			settingsToken
-		});
+			user.domains.length,
+			user.settingsToken
+		);
 
 		await db.user.update({
 			where: { id: user.id },
 			data: { lastHeartbeatSentAt: now }
 		});
 	}
+}
+
+async function queueHeartbeatEmail(
+	to: string,
+	generatedDate: string,
+	critical: { domain: string; expiresIn: string; expiresDate: string; issuer: string | null }[],
+	warning: { domain: string; expiresIn: string; expiresDate: string; issuer: string | null }[],
+	healthy: { domain: string; expiresIn: string; expiresDate: string; issuer: string | null }[],
+	totalDomains: number,
+	settingsToken: string
+) {
+	const settingsUrl = `${env.WEBSITE_URL}/settings?token=${settingsToken}`;
+	const html = renderHeartbeatEmail({
+		generatedDate,
+		critical,
+		warning,
+		healthy,
+		totalDomains,
+		settingsUrl
+	});
+
+	await db.emailOutbox.create({
+		data: {
+			recipients: [to],
+			subject: 'Your certificate status report',
+			body: html,
+			templateName: 'Heartbeat',
+			priority: EmailOutboxPriorities.Low
+		}
+	});
 }

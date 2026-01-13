@@ -2,8 +2,10 @@ import { form } from '$app/server';
 import { z } from 'zod';
 import { invalid, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { sendConfirmedDomainsEmail } from '$lib/server/email';
+import { EmailOutboxPriorities } from '$lib/server/email';
 import { createLogger } from '$lib/server/logger';
+import { renderConfirmedDomainsEmail } from '$lib/server/email-templates';
+import { env } from '$env/dynamic/private';
 
 const logger = createLogger('confirm');
 
@@ -55,8 +57,8 @@ export const confirm = form(
 
 		// Send email with confirmed domains list
 		if (confirmedUser) {
-			logger.info({ email: confirmedUser.email }, 'Sending confirmed domains list email');
-			await sendConfirmedDomainsEmail(
+			logger.info({ email: confirmedUser.email }, 'Queueing confirmed domains list email');
+			await queueConfirmedDomainsEmail(
 				confirmedUser.email,
 				confirmedUser.domains.map((d) => d.name),
 				confirmedUser.settingsToken
@@ -66,3 +68,18 @@ export const confirm = form(
 		redirect(303, '/confirmed');
 	}
 );
+
+async function queueConfirmedDomainsEmail(to: string, domains: string[], settingsToken: string) {
+	const settingsUrl = `${env.WEBSITE_URL}/settings?token=${settingsToken}`;
+	const html = renderConfirmedDomainsEmail({ domains, settingsUrl });
+
+	await db.emailOutbox.create({
+		data: {
+			recipients: [to],
+			subject: 'Your domains are now being monitored',
+			body: html,
+			templateName: 'Confirmed',
+			priority: EmailOutboxPriorities.Low
+		}
+	});
+}
