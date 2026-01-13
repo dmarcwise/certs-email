@@ -8,7 +8,8 @@ import { formatExpirationDate, formatExpiresIn } from '$lib/server/utils';
 import { renderExpiringDomainEmail, renderHeartbeatEmail } from '$lib/server/email-templates';
 import { env } from '$env/dynamic/private';
 
-const CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const CHECK_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+const CHECK_STALE_THRESHOLD_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 const HEARTBEAT_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const HEARTBEAT_PERIOD_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
@@ -203,7 +204,7 @@ async function deliverEmailOutboxJob(job: EmailOutbox) {
 
 async function runChecks() {
 	const now = new Date();
-	const staleBefore = new Date(now.getTime() - CHECK_INTERVAL_MS);
+	const staleBefore = new Date(now.getTime() - CHECK_STALE_THRESHOLD_MS);
 	const domains = await db.domain.findMany({
 		where: {
 			confirmed: true,

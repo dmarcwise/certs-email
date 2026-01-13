@@ -230,6 +230,12 @@
 		</p>
 	</FaqItem>
 
+	<FaqItem title="How often do you check my domains?">
+		<p>
+			We check your domains every 6 hours.
+		</p>
+	</FaqItem>
+
 	<FaqItem title="Do you support multiple IPs?">
 		<p>
 			No, we currently only take the first public IPv4 address returned by the DNS lookup for the domain.
