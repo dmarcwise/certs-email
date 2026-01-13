@@ -20,31 +20,26 @@ type ExpirationStatus = Exclude<DomainStatus, 'PENDING' | 'OK'>;
 
 const EXPIRATION_EMAIL_METADATA: Record<
 	ExpirationStatus,
-	{ label: string; className: string; subject: string }
+	{ isCritical: boolean; subject: string }
 > = {
 	[DomainStatus.EXPIRING_30DAYS]: {
-		label: 'EXPIRING IN 30 DAYS',
-		className: 'warning',
+		isCritical: false,
 		subject: 'Certificate expiring in 30 days'
 	},
 	[DomainStatus.EXPIRING_14DAYS]: {
-		label: 'EXPIRING IN 14 DAYS',
-		className: 'warning',
+		isCritical: false,
 		subject: 'Certificate expiring in 14 days'
 	},
 	[DomainStatus.EXPIRING_7DAYS]: {
-		label: 'EXPIRING IN 7 DAYS',
-		className: 'critical',
+		isCritical: true,
 		subject: 'Certificate expiring in 7 days'
 	},
 	[DomainStatus.EXPIRING_1DAY]: {
-		label: 'EXPIRING IN 1 DAY',
-		className: 'critical',
+		isCritical: true,
 		subject: 'Certificate expiring in 1 day'
 	},
 	[DomainStatus.EXPIRED]: {
-		label: 'EXPIRED',
-		className: 'critical',
+		isCritical: true,
 		subject: 'Certificate expired'
 	}
 };
@@ -185,12 +180,12 @@ async function queueExpiringDomainEmail(
 
 	const html = renderExpiringDomainEmail({
 		domain,
-		statusLabel: metadata.label,
-		statusClass: metadata.className,
 		expiresIn: formatExpiresIn(daysRemaining, status),
 		expiresDate: formatExpirationDate(notAfter),
 		issuer: issuer ?? 'Unknown',
-		settingsUrl
+		settingsUrl,
+		isCritical: metadata.isCritical,
+		isExpired: status === DomainStatus.EXPIRED
 	});
 
 	await db.emailOutbox.create({

@@ -53,12 +53,30 @@ const previewData = {
 	}),
 	expiring: {
 		domain: 'example.com',
-		statusLabel: 'EXPIRING IN 7 DAYS',
-		statusClass: 'critical',
 		expiresIn: 'in 7 days',
 		expiresDate: formatExpirationDate(daysFromNow(7)),
 		issuer: "Let's Encrypt",
-		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
+		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
+		isCritical: true,
+		isExpired: false
+	},
+	'expiring-warning': {
+		domain: 'api.example.com',
+		expiresIn: 'in 14 days',
+		expiresDate: formatExpirationDate(daysFromNow(14)),
+		issuer: "Let's Encrypt",
+		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
+		isCritical: false,
+		isExpired: false
+	},
+	'expiring-expired': {
+		domain: 'legacy.example.com',
+		expiresIn: 'expired',
+		expiresDate: formatExpirationDate(daysFromNow(-2)),
+		issuer: "Let's Encrypt",
+		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
+		isCritical: true,
+		isExpired: true
 	}
 };
 
@@ -74,6 +92,10 @@ export const GET: RequestHandler = async ({ params }) => {
 		html = renderHeartbeatEmail(previewData.heartbeat());
 	} else if (template === 'expiring') {
 		html = renderExpiringDomainEmail(previewData.expiring);
+	} else if (template === 'expiring-warning') {
+		html = renderExpiringDomainEmail(previewData['expiring-warning']);
+	} else if (template === 'expiring-expired') {
+		html = renderExpiringDomainEmail(previewData['expiring-expired']);
 	} else {
 		throw error(404, `Template '${template}' not found`);
 	}

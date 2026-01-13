@@ -4,16 +4,72 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Certificate expiration notice</title>
+	<style>
+		.alert {
+			padding: 16px;
+			font-size: 16px;
+			line-height: 1.6;
+			border: 2px solid;
+		}
+
+		.alert.critical {
+			border-color: #dc2626;
+			background: #fff5f5;
+		}
+
+		.alert.warning {
+			border-color: #ea580c;
+			background: #fff7ed;
+		}
+
+		.alert-icon {
+			margin-right: 8px;
+		}
+
+		.alert-domain {
+			font-weight: bold;
+		}
+
+		.alert-domain.critical {
+			color: #dc2626;
+		}
+
+		.alert-domain.warning {
+			color: #ea580c;
+		}
+
+		.alert-expires {
+			font-weight: bold;
+		}
+	</style>
 </head>
 <body>
 <div class="container">
-	<a href="https://certs.email" class="title">
-		certs.email
-	</a>
+	{{#if isCritical}}
+		<div class="alert critical">
+			<span class="alert-icon">🚨</span>
+			Your certificate for
+			<span class="alert-domain critical">{{domain}}</span>
+			{{#if isExpired}}
+				is now
+				<span class="alert-expires">EXPIRED</span>.
+			{{else}}
+				expires
+				<span class="alert-expires">{{expiresIn}}</span>.
+			{{/if}}
+		</div>
+	{{else}}
+		<div class="alert warning">
+			<span class="alert-icon">⚠️</span>
+			Your certificate for
+			<span class="alert-domain warning">{{domain}}</span>
+			expires
+			<span class="alert-expires">{{expiresIn}}</span>.
+		</div>
+	{{/if}}
+
 	<br>
-	Your certificate for <span class="{{statusClass}}">{{domain}}</span> is <strong>{{statusLabel}}</strong>.
-	<br><br>
-	Expires: {{expiresIn}} ({{expiresDate}})
+	Expiration date: {{expiresDate}}
 	<br>
 	Issuer: {{issuer}}
 </div>

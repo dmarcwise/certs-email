@@ -96,12 +96,12 @@ export function renderHeartbeatEmail(data: HeartbeatEmailData): string {
 
 interface ExpiringDomainEmailData {
 	domain: string;
-	statusLabel: string;
-	statusClass: string;
 	expiresIn: string;
 	expiresDate: string;
 	issuer: string;
 	settingsUrl: string;
+	isCritical: boolean;
+	isExpired: boolean;
 }
 
 export function renderExpiringDomainEmail(data: ExpiringDomainEmailData): string {
