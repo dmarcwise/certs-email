@@ -1,4 +1,4 @@
-import { DomainStatus, type EmailOutbox, Prisma } from '$prisma/generated/client';
+import { type Domain, DomainStatus, type EmailOutbox, Prisma } from '$prisma/generated/client';
 import { db } from './db';
 import { CertFetchError, type CertificateInfo, fetchCertificate } from './fetch-cert';
 import { computeDomainStatus } from './status';
@@ -13,6 +13,7 @@ const CHECK_STALE_THRESHOLD_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 const HEARTBEAT_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const HEARTBEAT_PERIOD_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
+const HEARTBEAT_ERROR_GRACE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 const EMAIL_OUTBOX_POLL_INTERVAL_MS = 10_000;
 const EMAIL_OUTBOX_BATCH_SIZE = 10;
@@ -366,13 +367,22 @@ async function runHeartbeat() {
 			continue;
 		}
 
-		const pending = user.domains
+		const errorCutoff = new Date(now.getTime() - HEARTBEAT_ERROR_GRACE_MS);
+		const isErrorDomain = (domain: Domain) =>
+			Boolean(domain.error && domain.errorStartedAt && domain.errorStartedAt <= errorCutoff);
+		const domainsInError = user.domains.filter(isErrorDomain).map((domain) => ({
+			domain: domain.name,
+			error: domain.error!
+		}));
+		const activeDomains = user.domains.filter((domain) => !isErrorDomain(domain));
+
+		const pending = activeDomains
 			.filter((domain) => domain.status === DomainStatus.PENDING)
 			.map((domain) => ({
 				domain: domain.name
 			}));
 
-		const domainInfo = user.domains
+		const domainInfo = activeDomains
 			.filter((domain) => domain.notAfter)
 			.map((domain) => {
 				const expirationDate = domain.notAfter!;
@@ -402,13 +412,14 @@ async function runHeartbeat() {
 
 		const healthy = domainInfo.filter((domain) => domain.status === DomainStatus.OK);
 
-		logger.info(`Sending heartbet report to user ${user.email}`);
+		logger.info(`Sending heartbeat report to user ${user.email}`);
 
 		await queueHeartbeatEmail(
 			user.email,
 			now.toISOString().split('T')[0],
 			critical,
 			warning,
+			domainsInError,
 			healthy,
 			pending,
 			user.domains.length,
@@ -427,6 +438,7 @@ async function queueHeartbeatEmail(
 	generatedDate: string,
 	critical: { domain: string; expiresIn: string; expiresDate: string; issuer: string | null }[],
 	warning: { domain: string; expiresIn: string; expiresDate: string; issuer: string | null }[],
+	errors: { domain: string; error: string }[],
 	healthy: { domain: string; expiresIn: string; expiresDate: string; issuer: string | null }[],
 	pending: { domain: string }[],
 	totalDomains: number,
@@ -437,6 +449,7 @@ async function queueHeartbeatEmail(
 		generatedDate,
 		critical,
 		warning,
+		errors,
 		healthy,
 		pending,
 		totalDomains,

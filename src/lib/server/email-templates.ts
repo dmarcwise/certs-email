@@ -73,10 +73,16 @@ interface PendingDomainInfo {
 	domain: string;
 }
 
+interface ErrorDomainInfo {
+	domain: string;
+	error: string;
+}
+
 interface HeartbeatEmailData {
 	generatedDate: string;
 	critical: DomainInfo[];
 	warning: DomainInfo[];
+	errors: ErrorDomainInfo[];
 	healthy: DomainInfo[];
 	pending: PendingDomainInfo[];
 	totalDomains: number;
@@ -103,4 +109,10 @@ export function renderExpiringDomainEmail(data: ExpiringDomainEmailData): string
 	return template(data);
 }
 
-export type { HeartbeatEmailData, DomainInfo, PendingDomainInfo, ExpiringDomainEmailData };
+export type {
+	HeartbeatEmailData,
+	DomainInfo,
+	PendingDomainInfo,
+	ErrorDomainInfo,
+	ExpiringDomainEmailData
+};

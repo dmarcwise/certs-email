@@ -41,13 +41,14 @@ const previewData = {
 		generatedDate: formatDate(new Date()),
 		critical: [makeCert('example.com', 3), makeCert('api.example.com', 5)],
 		warning: [makeCert('staging.example.com', 15), makeCert('test.example.com', 22)],
+		errors: [{ domain: 'broken.example.com', error: 'DNS lookup failed' }],
 		healthy: [
 			makeCert('www.example.com', 67),
 			makeCert('blog.example.com', 89),
 			makeCert('shop.example.com', 120)
 		],
 		pending: [{ domain: 'pending.example.com' }],
-		totalDomains: 8,
+		totalDomains: 9,
 		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
 	}),
 	expiring: {

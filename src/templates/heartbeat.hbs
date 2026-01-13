@@ -36,6 +36,16 @@
 		{{/each}}
 	{{/if}}
 
+	{{#if errors.length}}
+		<span class="section-title">ERRORS (checks failing ≥24h):</span><br>
+		<br>
+		{{#each errors}}
+			<span class="critical">● {{domain}}</span><br>
+			Error: {{error}}<br>
+			<br>
+		{{/each}}
+	{{/if}}
+
 	{{#if healthy.length}}
 		<span class="section-title">HEALTHY:</span><br>
 		<br>
