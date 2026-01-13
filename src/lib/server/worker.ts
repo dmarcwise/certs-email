@@ -365,6 +365,12 @@ async function runHeartbeat() {
 			continue;
 		}
 
+		const pending = user.domains
+			.filter((domain) => domain.status === DomainStatus.PENDING)
+			.map((domain) => ({
+				domain: domain.name
+			}));
+
 		const domainInfo = user.domains
 			.filter((domain) => domain.notAfter)
 			.map((domain) => {
@@ -403,6 +409,7 @@ async function runHeartbeat() {
 			critical,
 			warning,
 			healthy,
+			pending,
 			user.domains.length,
 			user.settingsToken
 		);
@@ -420,6 +427,7 @@ async function queueHeartbeatEmail(
 	critical: { domain: string; expiresIn: string; expiresDate: string; issuer: string | null }[],
 	warning: { domain: string; expiresIn: string; expiresDate: string; issuer: string | null }[],
 	healthy: { domain: string; expiresIn: string; expiresDate: string; issuer: string | null }[],
+	pending: { domain: string }[],
 	totalDomains: number,
 	settingsToken: string
 ) {
@@ -429,6 +437,7 @@ async function queueHeartbeatEmail(
 		critical,
 		warning,
 		healthy,
+		pending,
 		totalDomains,
 		settingsUrl
 	});

@@ -46,7 +46,8 @@ const previewData = {
 			makeCert('blog.example.com', 89),
 			makeCert('shop.example.com', 120)
 		],
-		totalDomains: 7,
+		pending: [{ domain: 'pending.example.com' }],
+		totalDomains: 8,
 		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
 	}),
 	expiring: {

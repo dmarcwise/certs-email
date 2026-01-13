@@ -47,6 +47,15 @@
 		{{/each}}
 	{{/if}}
 
+	{{#if pending.length}}
+		<span class="section-title">PENDING (awaiting first check):</span><br>
+		<br>
+		{{#each pending}}
+			<span>● {{domain}}</span><br>
+			<br>
+		{{/each}}
+	{{/if}}
+
 	<span class="section-title">SUMMARY:</span><br>
 	Total domains monitored: {{totalDomains}}
 </div>
