@@ -12,9 +12,7 @@ export const db =
 	new PrismaClient({
 		adapter: new PrismaPg({
 			connectionString: env.DATABASE_URL,
-			ssl: {
-				rejectUnauthorized: false
-			}
+			ssl: !dev && { rejectUnauthorized: false }
 		})
 	});
 
