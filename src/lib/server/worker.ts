@@ -322,7 +322,7 @@ async function queueExpiringDomainEmail(
 	settingsToken: string
 ) {
 	const metadata = EXPIRATION_EMAIL_METADATA[status];
-	const settingsUrl = `${env.WEBSITE_URL}/settings?token=${settingsToken}`;
+	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
 	const daysRemaining = Math.ceil((notAfter.getTime() - Date.now()) / 86_400_000);
 
 	const html = renderExpiringDomainEmail({
@@ -423,7 +423,7 @@ async function queueHeartbeatEmail(
 	totalDomains: number,
 	settingsToken: string
 ) {
-	const settingsUrl = `${env.WEBSITE_URL}/settings?token=${settingsToken}`;
+	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
 	const html = renderHeartbeatEmail({
 		generatedDate,
 		critical,

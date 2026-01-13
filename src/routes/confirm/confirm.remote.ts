@@ -70,7 +70,7 @@ export const confirm = form(
 );
 
 async function queueConfirmedDomainsEmail(to: string, domains: string[], settingsToken: string) {
-	const settingsUrl = `${env.WEBSITE_URL}/settings?token=${settingsToken}`;
+	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
 	const html = renderConfirmedDomainsEmail({ domains, settingsUrl });
 
 	await db.emailOutbox.create({

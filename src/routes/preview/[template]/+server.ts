@@ -35,7 +35,7 @@ const previewData = {
 	},
 	'confirmed-domains': {
 		domains: ['example.com', 'api.example.com', 'www.example.org'],
-		settingsUrl: `${env.WEBSITE_URL}/settings?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
+		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
 	},
 	heartbeat: () => ({
 		generatedDate: formatDate(new Date()),
@@ -47,7 +47,7 @@ const previewData = {
 			makeCert('shop.example.com', 120)
 		],
 		totalDomains: 7,
-		settingsUrl: `${env.WEBSITE_URL}/settings?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
+		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
 	}),
 	expiring: {
 		domain: 'example.com',
@@ -56,7 +56,7 @@ const previewData = {
 		expiresIn: 'in 7 days',
 		expiresDate: formatExpirationDate(daysFromNow(7)),
 		issuer: "Let's Encrypt",
-		settingsUrl: `${env.WEBSITE_URL}/settings?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
+		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
 	}
 };
 

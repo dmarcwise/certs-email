@@ -20,20 +20,16 @@ const MAX_DOMAINS_PER_USER = 20;
 export const submit = form(
 	z.object({
 		domains: z.string(),
-		email: z.email()
+		email: z.email(),
+		settingsToken: z.string().optional()
 	}),
-	async ({ domains, email }, issue) => {
+	async ({ domains, email, settingsToken }, issue) => {
 		// Parse and validate domains
 		const sanitizedDomains = domains
 			.split('\n')
 			.map((domain) => domain.trim().toLowerCase())
 			.filter((domain) => domain.length > 0);
 		const uniqueDomains = [...new Set(sanitizedDomains)];
-
-		logger.info(
-			{ email: email.trim().toLowerCase(), domainCount: uniqueDomains.length },
-			'New submission received'
-		);
 
 		if (uniqueDomains.length === 0) {
 			invalid(issue.domains('Enter at least one valid domain'));
@@ -45,7 +41,63 @@ export const submit = form(
 			}
 		}
 
+		const isEdit = !!settingsToken;
+
+		if (isEdit) {
+			const user = await db.user.findUnique({
+				where: { settingsToken },
+				include: { domains: true }
+			});
+
+			if (!user) {
+				invalid(issue.settingsToken('Invalid or expired settings link.'));
+			}
+
+			if (uniqueDomains.length > MAX_DOMAINS_PER_USER) {
+				invalid(
+					issue.domains(
+						`You can only monitor up to ${MAX_DOMAINS_PER_USER} domains. Your updated list has ${uniqueDomains.length}.`
+					)
+				);
+			}
+
+			const existingDomains = new Set(user.domains.map((domain) => domain.name));
+			const domainsToCreate = uniqueDomains.filter((name) => !existingDomains.has(name));
+			const domainsToRemove = user.domains
+				.map((domain) => domain.name)
+				.filter((name) => !uniqueDomains.includes(name));
+
+			if (domainsToRemove.length > 0) {
+				await db.domain.deleteMany({
+					where: {
+						userId: user.id,
+						name: { in: domainsToRemove }
+					}
+				});
+			}
+
+			if (domainsToCreate.length > 0) {
+				await db.domain.createMany({
+					data: domainsToCreate.map((name) => ({
+						userId: user.id,
+						name,
+						confirmed: user.confirmed,
+						status: DomainStatus.PENDING
+					}))
+				});
+			}
+
+			logger.info(
+				{ email: user.email, domainCount: uniqueDomains.length },
+				`Settings updated for user ${user.email}`
+			);
+
+			redirect(303, `/success?message=updated`);
+		}
+
 		email = email.trim().toLowerCase();
+
+		logger.info({ email, domainCount: uniqueDomains.length }, `New submission for ${email}`);
 
 		// Find or create user
 		let user = await db.user.findUnique({

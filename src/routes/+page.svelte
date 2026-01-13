@@ -7,9 +7,19 @@
 	import { submit } from './submit.remote';
 	import { resolve } from '$app/paths';
 
-	const { domains, email } = submit.fields;
+	const { data } = $props();
 
-	let submitError = false;
+	const { domains, email, settingsToken } = submit.fields;
+
+	if (data.edit) {
+		submit.fields.set({
+			domains: data.edit.domains,
+			email: data.edit.email,
+			settingsToken: data.edit.token
+		});
+	}
+
+	let submitError = $state(false);
 
 	const enhancedSubmit = submit.enhance(async ({ submit }) => {
 		try {
@@ -22,27 +32,47 @@
 </script>
 
 <main class="container">
+	{#if data.edit}
+		<p>
+			Update the domains monitored for <span class="font-medium">{data.edit.email}</span>.
+		</p>
 
-	<p>
-		certs.email is a simple tool for <span class="font-medium">automated SSL/TLS certificates monitoring</span>.
-	</p>
+		<p class="mt-2">
+			Submitting this form will replace your current list of monitored domains.
+		</p>
+	{:else}
+		<p>
+			certs.email is a simple tool for <span class="font-medium">automated SSL/TLS certificates monitoring</span>.
+		</p>
 
-	<p class="mt-2">
-		Enter your domain names and email address and we'll send you:
-	</p>
+		<p class="mt-2">Enter your domain names and email address and we'll send you:</p>
 
-	<ul class="mt-2 list-disc list-inside">
-		<li>
-			Expiration notifications 30 days, 14 days, 7 days and 1 day before the date
-			(<a href={resolve('/preview/expiring')} class="link">preview</a>).
-		</li>
-		<li>
-			Heartbeat reports with the status of your certificates every 2 weeks
-			(<a href={resolve('/preview/heartbeat')} class="link">preview</a>).
-		</li>
-	</ul>
+		<ul class="mt-2 list-inside list-disc">
+			<li>
+				Expiration notifications 30 days, 14 days, 7 days and 1 day before the date
+				(<a href={resolve('/preview/expiring')} class="link">preview</a>).
+			</li>
+			<li>
+				Heartbeat reports with the status of your certificates every 2 weeks
+				(<a href={resolve('/preview/heartbeat')} class="link">preview</a>).
+			</li>
+		</ul>
+	{/if}
+
+	{#if data.isTokenInvalid}
+		<p class="mt-6 text-red-600 font-medium">Invalid or expired settings link.</p>
+	{/if}
+
+	<!-- eslint-disable-next-line svelte/require-each-key -->
+	{#each settingsToken.issues() as issue}
+		<p class="mt-6 text-red-600 font-medium">{issue.message}</p>
+	{/each}
 
 	<form class="mt-10" {...enhancedSubmit}>
+		{#if data.edit}
+			<input type="hidden" {...settingsToken.as('text')} />
+		{/if}
+
 		<label class="block">
 			<span class="font-medium">
 				Domain names:
@@ -55,36 +85,45 @@
 
 			<!-- eslint-disable-next-line svelte/require-each-key -->
 			{#each domains.issues() as issue}
-				<p class="text-red-600 mt-2">{issue.message}</p>
+				<p class="mt-2 text-red-600">{issue.message}</p>
 			{/each}
 		</label>
 
-		<label class="block mt-6">
+		<label class="block mt-6"
+					 class:hidden={data.edit}>
 			<span class="font-medium">
 				Email address:
 			</span>
 
-			<Input placeholder="Enter your email address" class="mt-2 block w-full"
-						 required
-						 {...email.as('email')} />
+			<Input
+				placeholder="Enter your email address"
+				class="mt-2 block w-full"
+				required
+				{...email.as('email')}
+			/>
 
 			<!-- eslint-disable-next-line svelte/require-each-key -->
 			{#each email.issues() as issue}
-				<p class="text-red-600 mt-2">{issue.message}</p>
+				<p class="mt-2 text-red-600">{issue.message}</p>
 			{/each}
 		</label>
 
-		<p class="mt-6 text-sm text-zinc-600 dark:text-zinc-400">
+		<p class="mt-6 text-sm text-zinc-600 dark:text-zinc-400"
+			 class:hidden={data.edit}>
 			By continuing, you confirm that you have read our <a href={resolve('/privacy-policy')} class="link">Privacy
 			Policy</a>.
 		</p>
 
 		<Button
-			class="mt-6 w-full flex items-center justify-center gap-x-2 {!!submit.pending && 'disabled:cursor-progress'}"
+			class="mt-6 flex w-full items-center justify-center gap-x-2 {!!submit.pending && 'disabled:cursor-progress'}"
 			type="submit"
 			disabled={!!submit.pending}>
 			<CheckIcon class="size-4" />
-			Subscribe to notifications
+			{#if data.edit}
+				Update monitoring settings
+			{:else}
+				Subscribe to notifications
+			{/if}
 		</Button>
 
 		{#if submitError}
