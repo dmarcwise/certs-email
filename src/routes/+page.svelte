@@ -208,17 +208,28 @@
 
 	<FaqItem title="Is certs.email free?">
 		<p>
-			Yes! certs.email is free and allows up to 20 domains per email address.
+			Yes! certs.email is free and
+			<a href="https://github.com/dmarcwise/certs-email">
+				open source
+			</a>
+			and allows up to 20 domains per email address.
 		</p>
 	</FaqItem>
 
 	<FaqItem title="Can I trust you?">
 		<p>
-			certs.email is made by the creators of <a href="https://dmarcwise.io" target="_blank">DMARCwise</a>,
+			certs.email is made by the creators of <a href="https://dmarcwise.io">DMARCwise</a>,
 			a DMARC monitoring product used by thousands of companies.
 			<br>
 			Your email address is safe and is used only to send you the notifications. Read our privacy policy <a
 			href={resolve('/privacy-policy')}>here</a>.
+		</p>
+
+		<p>
+			This project is also open source
+			<a href="https://github.com/dmarcwise/certs-email">
+				on GitHub
+			</a>.
 		</p>
 	</FaqItem>
 
