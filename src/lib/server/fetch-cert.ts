@@ -58,7 +58,7 @@ export async function fetchCertificate(
 
 		const lookup = (
 			hostname: string,
-			_options: dns.LookupOptions,
+			options: dns.LookupOptions,
 			callback: (
 				err: NodeJS.ErrnoException | null,
 				address: string | dns.LookupAddress[],
@@ -67,13 +67,18 @@ export async function fetchCertificate(
 		) => {
 			dns.lookup(hostname, { family: 4, all: true }, (error, addresses) => {
 				if (error) {
-					callback(new CertFetchError('DNS lookup failed', error), '', 4);
+					callback(new CertFetchError('DNS lookup failed', error), '');
 					return;
 				}
 
 				const publicIp = addresses.find((address) => isValidGlobalIPv4(address.address));
 				if (!publicIp) {
-					callback(new CertFetchError('DNS lookup returned no public IPv4 addresses'), '', 4);
+					callback(new CertFetchError('DNS lookup returned no public IPv4 addresses'), '');
+					return;
+				}
+
+				if (options.all) {
+					callback(null, [publicIp]);
 					return;
 				}
 
