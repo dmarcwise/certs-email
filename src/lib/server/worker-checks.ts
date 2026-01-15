@@ -84,7 +84,7 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 		let dbErrorMessage: string;
 		if (error instanceof CertFetchError) {
 			dbErrorMessage = error.message;
-			logger.warn(`[${domain.name}] Check failed: ${dbErrorMessage}`);
+			logger.warn(error, `[${domain.name}] Check failed: ${dbErrorMessage}`);
 		} else {
 			dbErrorMessage = 'Unknown error';
 			logger.error(
