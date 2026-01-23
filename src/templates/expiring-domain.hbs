@@ -48,6 +48,7 @@
 			background: #f9fafb;
 			margin: 16px 0;
 			line-height: 1.8;
+			word-wrap: break-word;
 		}
 
 		.cert-label {
@@ -60,6 +61,14 @@
 			font-weight: bold;
 			margin-bottom: 8px;
 			margin-top: 20px;
+		}
+
+		/* Mobile responsive: stack labels and values */
+		@media only screen and (max-width: 480px) {
+			.cert-label {
+				display: block !important;
+				width: auto !important;
+			}
 		}
 	</style>
 </head>

@@ -33,9 +33,6 @@ function loadTemplate(name: string): HandlebarsTemplateDelegate {
 		extraCss: commonStyles
 	});
 
-	// Remove class attributes since styles are now inlined
-	inlinedHtml = inlinedHtml.replace(/\s+class="[^"]*"/g, '');
-
 	// Compile with Handlebars
 	const compiled = Handlebars.compile(inlinedHtml);
 
