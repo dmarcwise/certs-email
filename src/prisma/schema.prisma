@@ -39,10 +39,11 @@ model Domain {
   name           String
   port           Int?
   confirmed      Boolean      @default(false)
-  createdAt      DateTime     @default(now()) @db.Timestamptz
-  lastCheckedAt  DateTime?    @db.Timestamptz
-  lastNotifiedAt DateTime?    @db.Timestamptz
-  notBefore      DateTime?    @db.Timestamptz
+  createdAt                DateTime     @default(now()) @db.Timestamptz
+  lastCheckedAt            DateTime?    @db.Timestamptz
+  lastNotifiedAt           DateTime?    @db.Timestamptz
+  lastCertChangeNotifiedAt DateTime?    @db.Timestamptz
+  notBefore                DateTime?    @db.Timestamptz
   notAfter       DateTime?    @db.Timestamptz
   status         DomainStatus
   error          String?

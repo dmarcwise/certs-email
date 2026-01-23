@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Certificate changed</title>
+	<style>
+		.cert-box {
+			padding: 16px;
+			border: 2px solid;
+			margin: 16px 0;
+			line-height: 1.8;
+		}
+
+		.cert-box-old {
+			border-color: #6b7280;
+			background: #f9fafb;
+			color: #6b7280;
+		}
+
+		.cert-box-new {
+			border-color: #16a34a;
+			background: #f0fdf4;
+			color: #16a34a;
+		}
+
+		.cert-label {
+			font-weight: bold;
+			display: inline-block;
+			width: 120px;
+		}
+
+		.section-title {
+			font-weight: bold;
+			margin-bottom: 8px;
+		}
+
+		.timestamp {
+			margin-top: 16px;
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<a href="https://certs.email" class="title">
+		certs.email
+	</a>
+	<br><br>
+
+	<div class="title">
+		ℹ️ Certificate changed: {{domain}}
+	</div>
+
+	<div class="timestamp">
+		Detected at {{firstDetectedDate}}
+	</div>
+
+	<div class="section-title" style="margin-top: 20px;">OLD CERTIFICATE:</div>
+	<div class="cert-box cert-box-old">
+		<span class="cert-label">Domain:</span> {{oldCert.domain}}<br>
+		<span class="cert-label">Issuer:</span> {{oldCert.issuer}}<br>
+		<span class="cert-label">Valid from:</span> {{oldCert.validFrom}}<br>
+		<span class="cert-label">Valid until:</span> {{oldCert.validUntil}}<br>
+		{{#if oldCert.serial}}
+		<span class="cert-label">Serial:</span> {{oldCert.serial}}<br>
+		{{/if}}
+	</div>
+
+	<div class="section-title">NEW CERTIFICATE:</div>
+	<div class="cert-box cert-box-new">
+		<span class="cert-label">Domain:</span> {{newCert.domain}}<br>
+		<span class="cert-label">Issuer:</span> {{newCert.issuer}}<br>
+		<span class="cert-label">Valid from:</span> {{newCert.validFrom}}<br>
+		<span class="cert-label">Valid until:</span> {{newCert.validUntil}}<br>
+		{{#if newCert.serial}}
+		<span class="cert-label">Serial:</span> {{newCert.serial}}<br>
+		{{/if}}
+	</div>
+</div>
+
+<div class="footer">
+	You're receiving this email because you've subscribed to certificate expiration notifications on
+	<a href="https://certs.email">certs.email</a>.
+	<br><br>
+	<a href="{{settingsUrl}}">Unsubscribe</a>
+	or <a href="{{settingsUrl}}">change settings</a>.
+</div>
+</body>
+</html>

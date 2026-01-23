@@ -4,13 +4,15 @@ import confirmationTemplate from '$templates/confirmation.hbs?raw';
 import confirmedDomainsTemplate from '$templates/confirmed-domains.hbs?raw';
 import heartbeatTemplate from '$templates/heartbeat.hbs?raw';
 import expiringDomainTemplate from '$templates/expiring-domain.hbs?raw';
+import certificateChangedTemplate from '$templates/certificate-changed.hbs?raw';
 import commonStyles from '$templates/styles.css?raw';
 
 const templates: Record<string, string> = {
 	confirmation: confirmationTemplate,
 	confirmedDomains: confirmedDomainsTemplate,
 	heartbeat: heartbeatTemplate,
-	expiringDomain: expiringDomainTemplate
+	expiringDomain: expiringDomainTemplate,
+	certificateChanged: certificateChangedTemplate
 };
 
 // Cache for compiled templates with inlined CSS
@@ -109,10 +111,36 @@ export function renderExpiringDomainEmail(data: ExpiringDomainEmailData): string
 	return template(data);
 }
 
+interface CertificateChangedEmailData {
+	domain: string;
+	firstDetectedDate: string;
+	oldCert: {
+		domain: string;
+		issuer: string;
+		validFrom: string;
+		validUntil: string;
+		serial: string | null;
+	};
+	newCert: {
+		domain: string;
+		issuer: string;
+		validFrom: string;
+		validUntil: string;
+		serial: string | null;
+	};
+	settingsUrl: string;
+}
+
+export function renderCertificateChangedEmail(data: CertificateChangedEmailData): string {
+	const template = loadTemplate('certificateChanged');
+	return template(data);
+}
+
 export type {
 	HeartbeatEmailData,
 	DomainInfo,
 	PendingDomainInfo,
 	ErrorDomainInfo,
-	ExpiringDomainEmailData
+	ExpiringDomainEmailData,
+	CertificateChangedEmailData
 };

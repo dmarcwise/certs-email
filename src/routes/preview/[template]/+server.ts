@@ -3,7 +3,8 @@ import {
 	renderConfirmationEmail,
 	renderConfirmedDomainsEmail,
 	renderExpiringDomainEmail,
-	renderHeartbeatEmail
+	renderHeartbeatEmail,
+	renderCertificateChangedEmail
 } from '$lib/server/email-templates';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
@@ -77,6 +78,25 @@ const previewData = {
 		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
 		isCritical: true,
 		isExpired: true
+	},
+	'certificate-changed': {
+		domain: 'example.com',
+		firstDetectedDate: formatExpirationDate(new Date()),
+		oldCert: {
+			domain: 'example.com',
+			issuer: "Let's Encrypt",
+			validFrom: formatExpirationDate(daysFromNow(-60)),
+			validUntil: formatExpirationDate(daysFromNow(30)),
+			serial: '03A12B4C5D6E7F890ABCDEF0123456789ABC'
+		},
+		newCert: {
+			domain: 'example.com',
+			issuer: "Let's Encrypt",
+			validFrom: formatExpirationDate(daysFromNow(-1)),
+			validUntil: formatExpirationDate(daysFromNow(89)),
+			serial: '04B23C5D6E7F890ABCDEF0123456789ABCDE'
+		},
+		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
 	}
 };
 
@@ -96,6 +116,8 @@ export const GET: RequestHandler = async ({ params }) => {
 		html = renderExpiringDomainEmail(previewData['expiring-warning']);
 	} else if (template === 'expiring-expired') {
 		html = renderExpiringDomainEmail(previewData['expiring-expired']);
+	} else if (template === 'certificate-changed') {
+		html = renderCertificateChangedEmail(previewData['certificate-changed']);
 	} else {
 		throw error(404, `Template '${template}' not found`);
 	}

@@ -84,6 +84,10 @@
 				(<a href={resolve('/preview/expiring')} class="link">preview</a>).
 			</li>
 			<li>
+				Certificate change notifications when your certificate is replaced
+				(<a href={resolve('/preview/certificate-changed')} class="link">preview</a>).
+			</li>
+			<li>
 				Heartbeat reports with the status of your certificates every 2 weeks
 				(<a href={resolve('/preview/heartbeat')} class="link">preview</a>).
 			</li>
@@ -195,8 +199,9 @@
 
 	<FaqItem title="Why would I use certs.email?">
 		<p>
-			Certificate renewal may seem a solved problem, but we still sometimes see
-			website downtime caused by expired certificates, likely because of broken automation
+			Certificate renewal may seem a solved problem, but we still sometimes
+			<a href="https://x.com/Hetzner_Online/status/2013203208005423387">see</a>
+			website downtime caused by expired certificates, usually because of broken automation
 			or lack of monitoring.
 		</p>
 

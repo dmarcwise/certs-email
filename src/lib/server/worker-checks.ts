@@ -2,7 +2,7 @@ import { db } from '$lib/server/db';
 import { Prisma } from '$prisma/generated/client';
 import { DomainStatus } from '$prisma/generated/enums';
 import { formatExpirationDate, formatExpiresIn } from '$lib/server/utils';
-import { renderExpiringDomainEmail } from '$lib/server/email-templates';
+import { renderExpiringDomainEmail, renderCertificateChangedEmail } from '$lib/server/email-templates';
 import { EmailOutboxPriorities } from '$lib/server/email';
 import { createLogger } from '$lib/server/logger';
 import { CertFetchError, type CertificateInfo, fetchCertificate } from '$lib/server/fetch-cert';
@@ -112,6 +112,33 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 		return;
 	}
 
+	// Detect certificate change
+	const certChanged =
+		domain.fingerprint !== null && domain.fingerprint !== cert.fingerprint256;
+
+	if (certChanged) {
+		logger.info(`[${domain.name}] Certificate changed detected`);
+		await queueCertificateChangedEmail(
+			domain.user.email,
+			domain.name,
+			{
+				notBefore: domain.notBefore,
+				notAfter: domain.notAfter,
+				issuer: domain.issuer,
+				cn: domain.cn,
+				serial: domain.serial
+			},
+			{
+				notBefore: cert.notBefore,
+				notAfter: cert.notAfter,
+				issuer: cert.issuer,
+				cn: cert.cn,
+				serial: cert.serial
+			},
+			domain.user.settingsToken
+		);
+	}
+
 	const nextStatus = computeDomainStatus(cert.notAfter, now);
 	const shouldNotify = nextStatus !== domain.status && NOTIFY_STATUSES.has(nextStatus);
 	logger.info(`[${domain.name}] Status: ${nextStatus}`);
@@ -160,7 +187,8 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 				ip: cert.ip,
 				error: null,
 				errorStartedAt: null,
-				lastNotifiedAt: shouldNotify ? now : domain.lastNotifiedAt
+				lastNotifiedAt: shouldNotify ? now : domain.lastNotifiedAt,
+				lastCertChangeNotifiedAt: certChanged ? now : domain.lastCertChangeNotifiedAt
 			}
 		})
 	]);
@@ -194,6 +222,58 @@ async function queueExpiringDomainEmail(
 			subject: `${metadata.subject}: ${domain}`,
 			body: html,
 			templateName: 'Expiring',
+			priority: EmailOutboxPriorities.Medium
+		}
+	});
+}
+
+async function queueCertificateChangedEmail(
+	to: string,
+	domain: string,
+	oldCert: {
+		notBefore: Date | null;
+		notAfter: Date | null;
+		issuer: string | null;
+		cn: string | null;
+		serial: string | null;
+	},
+	newCert: {
+		notBefore: Date;
+		notAfter: Date;
+		issuer: string | null;
+		cn: string | null;
+		serial: string | null;
+	},
+	settingsToken: string
+) {
+	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
+
+	const html = renderCertificateChangedEmail({
+		domain,
+		firstDetectedDate: formatExpirationDate(new Date()),
+		oldCert: {
+			domain: oldCert.cn || domain,
+			issuer: oldCert.issuer || 'Unknown',
+			validFrom: formatExpirationDate(oldCert.notBefore!),
+			validUntil: formatExpirationDate(oldCert.notAfter!),
+			serial: oldCert.serial
+		},
+		newCert: {
+			domain: newCert.cn || domain,
+			issuer: newCert.issuer || 'Unknown',
+			validFrom: formatExpirationDate(newCert.notBefore),
+			validUntil: formatExpirationDate(newCert.notAfter),
+			serial: newCert.serial
+		},
+		settingsUrl
+	});
+
+	await db.emailOutbox.create({
+		data: {
+			recipients: [to],
+			subject: `Certificate changed: ${domain}`,
+			body: html,
+			templateName: 'CertificateChanged',
 			priority: EmailOutboxPriorities.Medium
 		}
 	});
