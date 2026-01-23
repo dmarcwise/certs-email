@@ -118,27 +118,34 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 
 	if (certChanged) {
 		logger.info(`[${domain.name}] Certificate changed detected`);
-		await queueCertificateChangedEmail(
-			domain.user.email,
-			domain.name,
-			{
-				notBefore: domain.notBefore,
-				notAfter: domain.notAfter,
-				issuer: domain.issuer,
-				cn: domain.cn,
-				san: domain.san,
-				serial: domain.serial
-			},
-			{
-				notBefore: cert.notBefore,
-				notAfter: cert.notAfter,
-				issuer: cert.issuer,
-				cn: cert.cn,
-				san: cert.san,
-				serial: cert.serial
-			},
-			domain.user.settingsToken
-		);
+
+		if (domain.user.sendCertChangeAlerts) {
+			await queueCertificateChangedEmail(
+				domain.user.email,
+				domain.name,
+				{
+					notBefore: domain.notBefore,
+					notAfter: domain.notAfter,
+					issuer: domain.issuer,
+					cn: domain.cn,
+					san: domain.san,
+					serial: domain.serial
+				},
+				{
+					notBefore: cert.notBefore,
+					notAfter: cert.notAfter,
+					issuer: cert.issuer,
+					cn: cert.cn,
+					san: cert.san,
+					serial: cert.serial
+				},
+				domain.user.settingsToken
+			);
+		} else {
+			logger.info(
+				`[${domain.name}] Skipping certificate change notification - user disabled alerts`
+			);
+		}
 	}
 
 	const nextStatus = computeDomainStatus(cert.notAfter, now);

@@ -23,8 +23,9 @@ model User {
   confirmTokenExpiresAt DateTime? @db.Timestamptz
   settingsToken         String    @unique
 
-  sendHeartbeatReport Boolean
-  lastHeartbeatSentAt DateTime? @db.Timestamptz
+  sendHeartbeatReport  Boolean
+  sendCertChangeAlerts Boolean   @default(true)
+  lastHeartbeatSentAt  DateTime? @db.Timestamptz
 
   domains Domain[]
 
@@ -36,18 +37,18 @@ model Domain {
   userId Int
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  name           String
-  port           Int?
-  confirmed      Boolean      @default(false)
+  name                     String
+  port                     Int?
+  confirmed                Boolean      @default(false)
   createdAt                DateTime     @default(now()) @db.Timestamptz
   lastCheckedAt            DateTime?    @db.Timestamptz
   lastNotifiedAt           DateTime?    @db.Timestamptz
   lastCertChangeNotifiedAt DateTime?    @db.Timestamptz
   notBefore                DateTime?    @db.Timestamptz
-  notAfter       DateTime?    @db.Timestamptz
-  status         DomainStatus
-  error          String?
-  errorStartedAt DateTime?    @db.Timestamptz
+  notAfter                 DateTime?    @db.Timestamptz
+  status                   DomainStatus
+  error                    String?
+  errorStartedAt           DateTime?    @db.Timestamptz
 
   issuer      String?
   cn          String? // Common Name

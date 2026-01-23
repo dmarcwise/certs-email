@@ -25,7 +25,9 @@ export const load: PageServerLoad = async ({ url }) => {
 		edit: {
 			token: settingsToken,
 			email: user.email,
-			domains: domains.join('\n')
+			domains: domains.join('\n'),
+			sendCertChangeAlerts: user.sendCertChangeAlerts,
+			sendHeartbeatReport: user.sendHeartbeatReport
 		}
 	};
 };

@@ -21,9 +21,11 @@ export const submit = form(
 	z.object({
 		domains: z.string(),
 		email: z.email(),
-		settingsToken: z.string().optional()
+		settingsToken: z.string().optional(),
+		sendCertChangeAlerts: z.boolean().optional(),
+		sendHeartbeatReport: z.boolean().optional()
 	}),
-	async ({ domains, email, settingsToken }, issue) => {
+	async ({ domains, email, settingsToken, sendCertChangeAlerts, sendHeartbeatReport }, issue) => {
 		// Parse and validate domains
 		const sanitizedDomains = domains
 			.split('\n')
@@ -87,6 +89,16 @@ export const submit = form(
 				});
 			}
 
+			// Update notification preferences
+			// In edit mode, treat undefined as false since unchecked checkboxes don't send values
+			await db.user.update({
+				where: { id: user.id },
+				data: {
+					sendCertChangeAlerts: sendCertChangeAlerts ?? false,
+					sendHeartbeatReport: sendHeartbeatReport ?? false
+				}
+			});
+
 			logger.info(
 				{ email: user.email, domainCount: uniqueDomains.length },
 				`Settings updated for user ${user.email}`
@@ -119,7 +131,8 @@ export const submit = form(
 					confirmToken: token,
 					confirmTokenExpiresAt: expiresAt,
 					settingsToken,
-					sendHeartbeatReport: true
+					sendHeartbeatReport: true,
+					sendCertChangeAlerts: true
 				},
 				include: { domains: true }
 			});

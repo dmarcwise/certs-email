@@ -12,7 +12,7 @@
 		<CheckIcon class="size-10 text-blue-800 dark:text-blue-600" />
 		{#if message === 'updated'}
 			<p class="mt-4 font-medium">Your monitoring settings have been updated.</p>
-			<p class="mt-2">We'll keep watching your domains and send alerts as usual.</p>
+			<p class="mt-2">We'll watch your domains and send alerts according to your preferences.</p>
 		{:else if message === 'unsubscribed'}
 			<p class="mt-4 font-medium">You've been unsubscribed from certs.email.</p>
 			<p class="mt-2">

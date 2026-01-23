@@ -2,6 +2,7 @@
 	import Button from '$lib/components/button.svelte';
 	import Input from '$lib/components/input.svelte';
 	import Textarea from '$lib/components/textarea.svelte';
+	import Checkbox from '$lib/components/checkbox.svelte';
 	import { CheckIcon, CircleXIcon } from '@lucide/svelte';
 	import FaqItem from './faq-item.svelte';
 	import { submit } from './submit.remote';
@@ -10,7 +11,7 @@
 
 	const { data } = $props();
 
-	const { domains, email, settingsToken } = submit.fields;
+	const { domains, email, settingsToken, sendCertChangeAlerts, sendHeartbeatReport } = submit.fields;
 	const { settingsToken: unsubscribeToken } = unsubscribe.fields;
 
 	let submitError = $state(false);
@@ -21,7 +22,9 @@
 			submit.fields.set({
 				domains: data.edit.domains,
 				email: data.edit.email,
-				settingsToken: data.edit.token
+				settingsToken: data.edit.token,
+				sendCertChangeAlerts: data.edit.sendCertChangeAlerts,
+				sendHeartbeatReport: data.edit.sendHeartbeatReport
 			});
 
 			unsubscribe.fields.set({
@@ -143,6 +146,42 @@
 			{/each}
 		</label>
 
+		{#if data.edit}
+			<div class="mt-6">
+				<h3 class="font-medium mb-3">Notification preferences</h3>
+
+				<label class="flex items-start gap-3 mb-3 cursor-not-allowed opacity-60">
+					<Checkbox checked disabled />
+					<div class="flex-1">
+						<span class="font-medium">Expiration alerts</span>
+						<p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+							Always enabled. Receive notifications 30, 14, 7, and 1 day before expiration.
+						</p>
+					</div>
+				</label>
+
+				<label class="flex items-start gap-3 mb-3 cursor-pointer">
+					<Checkbox {...sendCertChangeAlerts.as('checkbox')} />
+					<div class="flex-1">
+						<span class="font-medium">Certificate change alerts</span>
+						<p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+							Receive notifications when a certificate is replaced or changed.
+						</p>
+					</div>
+				</label>
+
+				<label class="flex items-start gap-3 cursor-pointer">
+					<Checkbox {...sendHeartbeatReport.as('checkbox')} />
+					<div class="flex-1">
+						<span class="font-medium">Heartbeat reports</span>
+						<p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+							Receive bi-weekly summary reports of all your monitored certificates.
+						</p>
+					</div>
+				</label>
+			</div>
+		{/if}
+
 		<p class="mt-6 text-sm text-zinc-600 dark:text-zinc-400"
 			 class:hidden={data.edit}>
 			By continuing, you confirm that you have read our <a href={resolve('/privacy-policy')} class="link">Privacy
@@ -179,7 +218,7 @@
 				disabled={!!unsubscribe.pending}
 			>
 				<CircleXIcon class="size-4" />
-				Unsubscribe from notifications
+				Unsubscribe from all notifications
 			</Button>
 
 			<!-- eslint-disable-next-line svelte/require-each-key -->
