@@ -279,11 +279,21 @@
 		</p>
 	</FaqItem>
 
-	<FaqItem title="Why bi-weekly reports?">
+	<FaqItem title="Why would I want certificate change alerts and bi-weekly reports?">
 		<p>
-			Email isn't perfect: if we can't reach you, you may miss important notifications.
-			To help with this, we send a report every 2 weeks as a heartbeat, confirming that notifications are still
-			working.
+			If this service only sent expiration notifications, you may at some point wonder
+			if it's working at all. This is why by default we also send you a notification
+			when we detect a new certificate for any of your domains, and one status report (heartbeat) every 2 weeks.
+		</p>
+
+		<p>
+			This way, you can be sure that certs.email is actively monitoring your domains,
+			that notifications are still working and that we can reach you correctly (email is all but perfect!).
+		</p>
+
+		<p>
+			If you don't find these additional notifications useful, you can disable them
+			from the settings link you can find in any email we send you.
 		</p>
 	</FaqItem>
 
