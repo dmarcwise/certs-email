@@ -79,9 +79,9 @@
 			certs.email is a simple tool for <span class="font-medium">automated SSL/TLS certificates monitoring</span>.
 		</p>
 
-		<p class="mt-2">Enter your domain names and email address and we'll send you:</p>
+		<p class="mt-4">Enter your domain names and email address and we'll send you:</p>
 
-		<ul class="mt-2 list-inside list-disc">
+		<ul class="mt-2 space-y-1 list-inside list-disc">
 			<li>
 				Expiration notifications 30 days, 14 days, 7 days and 1 day before the date
 				(<a href={resolve('/preview/expiring')} class="link">preview</a>).
@@ -89,10 +89,12 @@
 			<li>
 				Certificate change notifications when your certificate is replaced
 				(<a href={resolve('/preview/certificate-changed')} class="link">preview</a>).
+				<span class="uppercase text-white bg-blue-800 text-xs rounded px-1.25 py-px cursor-default">Optional</span>
 			</li>
 			<li>
 				Heartbeat reports with the status of your certificates every 2 weeks
 				(<a href={resolve('/preview/heartbeat')} class="link">preview</a>).
+				<span class="uppercase text-white bg-blue-800 text-xs rounded px-1.25 py-px cursor-default">Optional</span>
 			</li>
 		</ul>
 	{/if}
