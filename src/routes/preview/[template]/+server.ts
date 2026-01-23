@@ -55,8 +55,12 @@ const previewData = {
 	expiring: {
 		domain: 'example.com',
 		expiresIn: 'in 7 days',
-		expiresDate: formatExpirationDate(daysFromNow(7)),
+		validUntil: formatExpirationDate(daysFromNow(7)),
+		validFrom: formatExpirationDate(daysFromNow(-60)),
 		issuer: "Let's Encrypt",
+		cn: '*.example.com',
+		san: ['example.com', '*.example.com', 'www.example.com'],
+		serial: '03A12B4C5D6E7F890ABCDEF0123456789ABC',
 		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
 		isCritical: true,
 		isExpired: false
@@ -64,8 +68,12 @@ const previewData = {
 	'expiring-warning': {
 		domain: 'api.example.com',
 		expiresIn: 'in 14 days',
-		expiresDate: formatExpirationDate(daysFromNow(14)),
+		validUntil: formatExpirationDate(daysFromNow(14)),
+		validFrom: formatExpirationDate(daysFromNow(-76)),
 		issuer: "Let's Encrypt",
+		cn: 'api.example.com',
+		san: ['api.example.com'],
+		serial: '05C34D6E7F890ABCDEF0123456789ABCDE',
 		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
 		isCritical: false,
 		isExpired: false
@@ -73,8 +81,12 @@ const previewData = {
 	'expiring-expired': {
 		domain: 'legacy.example.com',
 		expiresIn: 'expired',
-		expiresDate: formatExpirationDate(daysFromNow(-2)),
+		validUntil: formatExpirationDate(daysFromNow(-2)),
+		validFrom: formatExpirationDate(daysFromNow(-92)),
 		issuer: "Let's Encrypt",
+		cn: 'legacy.example.com',
+		san: ['legacy.example.com'],
+		serial: '02D45E7F890ABCDEF0123456789ABCDEF',
 		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
 		isCritical: true,
 		isExpired: true
@@ -87,14 +99,18 @@ const previewData = {
 			issuer: "Let's Encrypt",
 			validFrom: formatExpirationDate(daysFromNow(-60)),
 			validUntil: formatExpirationDate(daysFromNow(30)),
-			serial: '03A12B4C5D6E7F890ABCDEF0123456789ABC'
+			serial: '03A12B4C5D6E7F890ABCDEF0123456789ABC',
+			cn: 'example.com',
+			san: ['example.com', 'www.example.com']
 		},
 		newCert: {
-			domain: 'example.com',
+			domain: '*.example.com',
 			issuer: "Let's Encrypt",
 			validFrom: formatExpirationDate(daysFromNow(-1)),
 			validUntil: formatExpirationDate(daysFromNow(89)),
-			serial: '04B23C5D6E7F890ABCDEF0123456789ABCDE'
+			serial: '04B23C5D6E7F890ABCDEF0123456789ABCDE',
+			cn: '*.example.com',
+			san: ['example.com', '*.example.com', 'www.example.com']
 		},
 		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`
 	}

@@ -99,8 +99,12 @@ export function renderHeartbeatEmail(data: HeartbeatEmailData): string {
 interface ExpiringDomainEmailData {
 	domain: string;
 	expiresIn: string;
-	expiresDate: string;
+	validUntil: string;
+	validFrom: string;
 	issuer: string;
+	cn: string | null;
+	san: string[];
+	serial: string | null;
 	settingsUrl: string;
 	isCritical: boolean;
 	isExpired: boolean;
@@ -120,6 +124,8 @@ interface CertificateChangedEmailData {
 		validFrom: string;
 		validUntil: string;
 		serial: string | null;
+		cn: string | null;
+		san: string[];
 	};
 	newCert: {
 		domain: string;
@@ -127,6 +133,8 @@ interface CertificateChangedEmailData {
 		validFrom: string;
 		validUntil: string;
 		serial: string | null;
+		cn: string | null;
+		san: string[];
 	};
 	settingsUrl: string;
 }

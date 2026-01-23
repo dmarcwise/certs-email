@@ -126,6 +126,7 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 				notAfter: domain.notAfter,
 				issuer: domain.issuer,
 				cn: domain.cn,
+				san: domain.san,
 				serial: domain.serial
 			},
 			{
@@ -133,6 +134,7 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 				notAfter: cert.notAfter,
 				issuer: cert.issuer,
 				cn: cert.cn,
+				san: cert.san,
 				serial: cert.serial
 			},
 			domain.user.settingsToken
@@ -152,8 +154,12 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 			domain.user.email,
 			nextStatus as ExpirationStatus,
 			domain.name,
+			cert.notBefore,
 			cert.notAfter,
 			cert.issuer,
+			cert.cn,
+			cert.san,
+			cert.serial,
 			domain.user.settingsToken
 		);
 	}
@@ -198,8 +204,12 @@ async function queueExpiringDomainEmail(
 	to: string,
 	status: ExpirationStatus,
 	domain: string,
+	notBefore: Date,
 	notAfter: Date,
 	issuer: string | null,
+	cn: string | null,
+	san: string[],
+	serial: string | null,
 	settingsToken: string
 ) {
 	const metadata = EXPIRATION_EMAIL_METADATA[status];
@@ -209,8 +219,12 @@ async function queueExpiringDomainEmail(
 	const html = renderExpiringDomainEmail({
 		domain,
 		expiresIn: formatExpiresIn(daysRemaining, status),
-		expiresDate: formatExpirationDate(notAfter),
+		validUntil: formatExpirationDate(notAfter),
+		validFrom: formatExpirationDate(notBefore),
 		issuer: issuer ?? 'Unknown',
+		cn,
+		san,
+		serial,
 		settingsUrl,
 		isCritical: metadata.isCritical,
 		isExpired: status === DomainStatus.EXPIRED
@@ -235,6 +249,7 @@ async function queueCertificateChangedEmail(
 		notAfter: Date | null;
 		issuer: string | null;
 		cn: string | null;
+		san: string[];
 		serial: string | null;
 	},
 	newCert: {
@@ -242,6 +257,7 @@ async function queueCertificateChangedEmail(
 		notAfter: Date;
 		issuer: string | null;
 		cn: string | null;
+		san: string[];
 		serial: string | null;
 	},
 	settingsToken: string
@@ -256,14 +272,18 @@ async function queueCertificateChangedEmail(
 			issuer: oldCert.issuer || 'Unknown',
 			validFrom: formatExpirationDate(oldCert.notBefore!),
 			validUntil: formatExpirationDate(oldCert.notAfter!),
-			serial: oldCert.serial
+			serial: oldCert.serial,
+			cn: oldCert.cn,
+			san: oldCert.san
 		},
 		newCert: {
 			domain: newCert.cn || domain,
 			issuer: newCert.issuer || 'Unknown',
 			validFrom: formatExpirationDate(newCert.notBefore),
 			validUntil: formatExpirationDate(newCert.notAfter),
-			serial: newCert.serial
+			serial: newCert.serial,
+			cn: newCert.cn,
+			san: newCert.san
 		},
 		settingsUrl
 	});

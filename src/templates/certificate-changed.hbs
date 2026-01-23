@@ -15,7 +15,6 @@
 		.cert-box-old {
 			border-color: #6b7280;
 			background: #f9fafb;
-			color: #6b7280;
 		}
 
 		.cert-box-new {
@@ -59,22 +58,30 @@
 	<div class="cert-box cert-box-old">
 		<span class="cert-label">Domain:</span> {{oldCert.domain}}<br>
 		<span class="cert-label">Issuer:</span> {{oldCert.issuer}}<br>
+		<span class="cert-label">CN:</span> {{#if oldCert.cn}}{{oldCert.cn}}{{else}}-{{/if}}<br>
+		<span class="cert-label">SAN:</span>
+		{{#if oldCert.san.length}}
+			{{#each oldCert.san}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+		{{else}}-{{/if}}<br>
+		<span class="cert-label">Serial:</span> {{#if oldCert.serial}}{{oldCert.serial}}{{else}}-{{/if}}<br>
+		<hr style="border: none; border-top: 1px solid #d1d5db; margin: 12px 0;">
 		<span class="cert-label">Valid from:</span> {{oldCert.validFrom}}<br>
 		<span class="cert-label">Valid until:</span> {{oldCert.validUntil}}<br>
-		{{#if oldCert.serial}}
-		<span class="cert-label">Serial:</span> {{oldCert.serial}}<br>
-		{{/if}}
 	</div>
 
 	<div class="section-title">NEW CERTIFICATE:</div>
 	<div class="cert-box cert-box-new">
 		<span class="cert-label">Domain:</span> {{newCert.domain}}<br>
 		<span class="cert-label">Issuer:</span> {{newCert.issuer}}<br>
+		<span class="cert-label">CN:</span> {{#if newCert.cn}}{{newCert.cn}}{{else}}-{{/if}}<br>
+		<span class="cert-label">SAN:</span>
+		{{#if newCert.san.length}}
+			{{#each newCert.san}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+		{{else}}-{{/if}}<br>
+		<span class="cert-label">Serial:</span> {{#if newCert.serial}}{{newCert.serial}}{{else}}-{{/if}}<br>
+		<hr style="border: none; border-top: 1px solid #a6dab8; margin: 12px 0;">
 		<span class="cert-label">Valid from:</span> {{newCert.validFrom}}<br>
 		<span class="cert-label">Valid until:</span> {{newCert.validUntil}}<br>
-		{{#if newCert.serial}}
-		<span class="cert-label">Serial:</span> {{newCert.serial}}<br>
-		{{/if}}
 	</div>
 </div>
 

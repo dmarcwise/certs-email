@@ -41,6 +41,26 @@
 		.alert-expires {
 			font-weight: bold;
 		}
+
+		.cert-box {
+			padding: 16px;
+			border: 2px solid #6b7280;
+			background: #f9fafb;
+			margin: 16px 0;
+			line-height: 1.8;
+		}
+
+		.cert-label {
+			font-weight: bold;
+			display: inline-block;
+			width: 120px;
+		}
+
+		.section-title {
+			font-weight: bold;
+			margin-bottom: 8px;
+			margin-top: 20px;
+		}
 	</style>
 </head>
 <body>
@@ -73,10 +93,21 @@
 		</div>
 	{{/if}}
 
-	<br>
-	Expiration date: {{expiresDate}}
-	<br>
-	Issuer: {{issuer}}
+	<div class="section-title">CERTIFICATE DETAILS:</div>
+	<div class="cert-box">
+		<span class="cert-label">Domain:</span> {{domain}}<br>
+		<span class="cert-label">Issuer:</span> {{issuer}}<br>
+		<span class="cert-label">CN:</span> {{#if cn}}{{cn}}{{else}}-{{/if}}<br>
+		<span class="cert-label">SAN:</span>
+		{{#if san.length}}
+			{{#each san}}{{this}}{{#unless @last}}, {{/unless}}
+			{{/each}}
+		{{else}}-{{/if}}<br>
+		<span class="cert-label">Serial:</span> {{#if serial}}{{serial}}{{else}}-{{/if}}<br>
+		<hr style="border: none; border-top: 1px solid #d1d5db; margin: 12px 0;">
+		<span class="cert-label">Valid from:</span> {{validFrom}}<br>
+		<span class="cert-label">Valid until:</span> {{validUntil}}<br>
+	</div>
 </div>
 
 <div class="footer">
