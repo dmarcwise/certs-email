@@ -23,3 +23,7 @@ Properly use SvelteKit aliases like `$templates` and `$prisma` in imports.
 Run `npm run generate-migration -- --name {migrationName}` to create a new database migration. Do not apply migrations as the user will do that after review.
 
 Run `npx prisma generate` after changing the Prisma schema.
+
+## Environment variables
+
+When adding new environment variables, update both `.env.example` and `docker-compose.yml`.
