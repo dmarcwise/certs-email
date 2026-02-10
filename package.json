@@ -50,6 +50,7 @@
 		"handlebars": "^4.7.8",
 		"ipaddr.js": "^2.2.0",
 		"juice": "^11.1.0",
+		"lettermint": "^1.5.0",
 		"mailtrap": "^4.4.0",
 		"mode-watcher": "^1.1.0",
 		"pg": "^8.16.3",
