@@ -6,6 +6,8 @@ services:
     environment:
       - WEBSITE_URL
       - DATABASE_URL
+      - EMAIL_PROVIDER
+      - LETTERMINT_API_TOKEN
       - MAILTRAP_API_KEY
     networks:
       - dmw
