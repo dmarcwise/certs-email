@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { userPrefersMode } from 'mode-watcher';
 	import { SproutIcon } from '@lucide/svelte';
+	import EuFlagImage from '$lib/assets/eu-flag.png';
 </script>
 
 <footer class="container mb-12">
@@ -15,9 +16,7 @@
 			</div>
 
 			<div class="mt-2 text-zinc-600 dark:text-zinc-400 flex items-center gap-x-3 leading-tight">
-				<img
-					src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1599px-Flag_of_Europe.svg.png?20081021155534"
-					class="w-8 rounded" alt="EU flag" />
+				<img src={EuFlagImage} class="w-8 rounded" alt="European Union flag" />
 
 				Proudly made and hosted in the European Union
 			</div>
