@@ -5,6 +5,7 @@ set -euo pipefail
 # - COMPOSE_FILE_PATH
 # - OP_CONNECT_TOKEN
 # - DOCKER_REGISTRY_NAME
+# - DOCKER_REGISTRY_USERNAME
 # - DOCKER_REGISTRY_TOKEN
 # - DOCKER_IMAGE
 
@@ -20,7 +21,7 @@ done
 
 echo "Logging in to Docker registry '${DOCKER_REGISTRY_NAME}'"
 
-echo $DOCKER_REGISTRY_TOKEN | docker login --username AWS --password-stdin $DOCKER_REGISTRY_NAME
+printf '%s' "$DOCKER_REGISTRY_TOKEN" | docker login --username "$DOCKER_REGISTRY_USERNAME" --password-stdin "$DOCKER_REGISTRY_NAME"
 
 echo "Deploying ${DOCKER_IMAGE}"
 
