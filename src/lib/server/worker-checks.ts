@@ -223,7 +223,7 @@ async function queueExpiringDomainEmail(
 	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
 	const daysRemaining = Math.ceil((notAfter.getTime() - Date.now()) / 86_400_000);
 
-	const html = renderExpiringDomainEmail({
+	const { html, text } = renderExpiringDomainEmail({
 		domain,
 		expiresIn: formatExpiresIn(daysRemaining, status),
 		validUntil: formatExpirationDate(notAfter),
@@ -242,6 +242,7 @@ async function queueExpiringDomainEmail(
 			recipients: [to],
 			subject: `${metadata.subject}: ${domain}`,
 			body: html,
+			textBody: text,
 			templateName: 'Expiring',
 			priority: EmailOutboxPriorities.Medium
 		}
@@ -271,7 +272,7 @@ async function queueCertificateChangedEmail(
 ) {
 	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
 
-	const html = renderCertificateChangedEmail({
+	const { html, text } = renderCertificateChangedEmail({
 		domain,
 		firstDetectedDate: formatExpirationDate(new Date()),
 		oldCert: {
@@ -300,6 +301,7 @@ async function queueCertificateChangedEmail(
 			recipients: [to],
 			subject: `Certificate changed: ${domain}`,
 			body: html,
+			textBody: text,
 			templateName: 'CertificateChanged',
 			priority: EmailOutboxPriorities.Medium
 		}

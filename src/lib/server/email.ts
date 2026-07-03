@@ -36,13 +36,20 @@ export const EmailOutboxPriorities = {
 	Low: 10
 } as const;
 
-async function sendEmail(options: { to: string[]; subject: string; html: string; tag?: string }) {
+async function sendEmail(options: {
+	to: string[];
+	subject: string;
+	html: string;
+	text?: string;
+	tag?: string;
+}) {
 	if (provider === 'mailtrap') {
 		await getMailtrap().send({
 			from: defaultFrom,
 			to: options.to.map((email) => ({ email })),
 			subject: options.subject,
 			html: options.html,
+			text: options.text,
 			category: options.tag
 		});
 	} else {
@@ -52,6 +59,7 @@ async function sendEmail(options: { to: string[]; subject: string; html: string;
 			.subject(options.subject)
 			.html(options.html);
 
+		if (options.text) email.text(options.text);
 		if (options.tag) email.tag(options.tag);
 
 		await email.send();
@@ -68,6 +76,7 @@ export async function sendQueuedEmail(job: EmailOutbox) {
 		to: job.recipients,
 		subject: job.subject,
 		html: job.body,
+		text: job.textBody ?? undefined,
 		tag
 	});
 }

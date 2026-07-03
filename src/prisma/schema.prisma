@@ -119,6 +119,7 @@ model EmailOutbox {
   replyTo      String?
   subject      String
   body         String
+  textBody     String?
   templateName String?
 
   @@map("email_outbox")

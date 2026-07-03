@@ -1,0 +1,58 @@
+certs.email
+Heartbeat report - Generated on {{generatedDate}}
+
+{{#if critical.length}}
+CRITICAL (expires in ≤7 days):
+
+{{#each critical}}
+- {{domain}}
+  Expires: {{expiresIn}} ({{expiresDate}})
+  Issuer: {{issuer}}
+{{/each}}
+
+{{/if}}
+{{#if warning.length}}
+WARNING (expires in ≤30 days):
+
+{{#each warning}}
+- {{domain}}
+  Expires: {{expiresIn}} ({{expiresDate}})
+  Issuer: {{issuer}}
+{{/each}}
+
+{{/if}}
+{{#if errors.length}}
+ERRORS (checks failing ≥24h):
+
+{{#each errors}}
+- {{domain}}
+  Error: {{error}}
+{{/each}}
+
+{{/if}}
+{{#if healthy.length}}
+HEALTHY:
+
+{{#each healthy}}
+- {{domain}}
+  Expires: {{expiresIn}} ({{expiresDate}})
+  Issuer: {{issuer}}
+{{/each}}
+
+{{/if}}
+{{#if pending.length}}
+PENDING (awaiting first check):
+
+{{#each pending}}
+- {{domain}}
+{{/each}}
+
+{{/if}}
+SUMMARY:
+
+Total domains monitored: {{totalDomains}}
+
+You're receiving this email because you've subscribed to certificate expiration notifications on certs.email.
+
+Unsubscribe or change settings:
+{{settingsUrl}}

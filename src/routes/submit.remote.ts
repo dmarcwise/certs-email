@@ -195,13 +195,14 @@ export const submit = form(
 
 async function queueConfirmationEmail(to: string, confirmToken: string) {
 	const confirmUrl = `${env.WEBSITE_URL}/confirm?token=${confirmToken}`;
-	const html = renderConfirmationEmail({ confirmUrl });
+	const { html, text } = renderConfirmationEmail({ confirmUrl });
 
 	await db.emailOutbox.create({
 		data: {
 			recipients: [to],
 			subject: 'Confirm your certs.email subscription',
 			body: html,
+			textBody: text,
 			templateName: 'Confirmation',
 			priority: EmailOutboxPriorities.High
 		}

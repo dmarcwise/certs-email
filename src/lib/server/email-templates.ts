@@ -1,40 +1,50 @@
 import Handlebars from 'handlebars';
 import juice from 'juice';
 import confirmationTemplate from '$templates/confirmation.hbs?raw';
+import confirmationTextTemplate from '$templates/confirmation.text.hbs?raw';
 import confirmedDomainsTemplate from '$templates/confirmed-domains.hbs?raw';
+import confirmedDomainsTextTemplate from '$templates/confirmed-domains.text.hbs?raw';
 import heartbeatTemplate from '$templates/heartbeat.hbs?raw';
+import heartbeatTextTemplate from '$templates/heartbeat.text.hbs?raw';
 import expiringDomainTemplate from '$templates/expiring-domain.hbs?raw';
+import expiringDomainTextTemplate from '$templates/expiring-domain.text.hbs?raw';
 import certificateChangedTemplate from '$templates/certificate-changed.hbs?raw';
+import certificateChangedTextTemplate from '$templates/certificate-changed.text.hbs?raw';
 import commonStyles from '$templates/styles.css?raw';
 
-const templates: Record<string, string> = {
-	confirmation: confirmationTemplate,
-	confirmedDomains: confirmedDomainsTemplate,
-	heartbeat: heartbeatTemplate,
-	expiringDomain: expiringDomainTemplate,
-	certificateChanged: certificateChangedTemplate
+const templates: Record<string, { html: string; text: string }> = {
+	confirmation: { html: confirmationTemplate, text: confirmationTextTemplate },
+	confirmedDomains: { html: confirmedDomainsTemplate, text: confirmedDomainsTextTemplate },
+	heartbeat: { html: heartbeatTemplate, text: heartbeatTextTemplate },
+	expiringDomain: { html: expiringDomainTemplate, text: expiringDomainTextTemplate },
+	certificateChanged: { html: certificateChangedTemplate, text: certificateChangedTextTemplate }
 };
 
 // Cache for compiled templates with inlined CSS
-const templateCache = new Map<string, HandlebarsTemplateDelegate>();
+const templateCache = new Map<
+	string,
+	{ html: HandlebarsTemplateDelegate; text: HandlebarsTemplateDelegate }
+>();
 
-function loadTemplate(name: string): HandlebarsTemplateDelegate {
+function loadTemplate(name: string) {
 	if (templateCache.has(name)) {
 		return templateCache.get(name)!;
 	}
 
-	const templateHtml = templates[name];
-	if (!templateHtml) {
+	const template = templates[name];
+	if (!template) {
 		throw new Error(`Template '${name}' not found`);
 	}
 
 	// Inline CSS using css-inline with common styles injected
-	let inlinedHtml = juice(templateHtml, {
+	const inlinedHtml = juice(template.html, {
 		extraCss: commonStyles
 	});
 
-	// Compile with Handlebars
-	const compiled = Handlebars.compile(inlinedHtml);
+	const compiled = {
+		html: Handlebars.compile(inlinedHtml),
+		text: Handlebars.compile(template.text, { noEscape: true })
+	};
 
 	// Cache it
 	templateCache.set(name, compiled);
@@ -46,9 +56,9 @@ interface ConfirmationEmailData {
 	confirmUrl: string;
 }
 
-export function renderConfirmationEmail(data: ConfirmationEmailData): string {
+export function renderConfirmationEmail(data: ConfirmationEmailData): EmailContent {
 	const template = loadTemplate('confirmation');
-	return template(data);
+	return { html: template.html(data), text: template.text(data) };
 }
 
 interface ConfirmedDomainsEmailData {
@@ -56,9 +66,9 @@ interface ConfirmedDomainsEmailData {
 	settingsUrl: string;
 }
 
-export function renderConfirmedDomainsEmail(data: ConfirmedDomainsEmailData): string {
+export function renderConfirmedDomainsEmail(data: ConfirmedDomainsEmailData): EmailContent {
 	const template = loadTemplate('confirmedDomains');
-	return template(data);
+	return { html: template.html(data), text: template.text(data) };
 }
 
 interface DomainInfo {
@@ -88,9 +98,9 @@ interface HeartbeatEmailData {
 	settingsUrl: string;
 }
 
-export function renderHeartbeatEmail(data: HeartbeatEmailData): string {
+export function renderHeartbeatEmail(data: HeartbeatEmailData): EmailContent {
 	const template = loadTemplate('heartbeat');
-	return template(data);
+	return { html: template.html(data), text: template.text(data) };
 }
 
 interface ExpiringDomainEmailData {
@@ -107,9 +117,9 @@ interface ExpiringDomainEmailData {
 	isExpired: boolean;
 }
 
-export function renderExpiringDomainEmail(data: ExpiringDomainEmailData): string {
+export function renderExpiringDomainEmail(data: ExpiringDomainEmailData): EmailContent {
 	const template = loadTemplate('expiringDomain');
-	return template(data);
+	return { html: template.html(data), text: template.text(data) };
 }
 
 interface CertificateChangedEmailData {
@@ -136,9 +146,14 @@ interface CertificateChangedEmailData {
 	settingsUrl: string;
 }
 
-export function renderCertificateChangedEmail(data: CertificateChangedEmailData): string {
+export function renderCertificateChangedEmail(data: CertificateChangedEmailData): EmailContent {
 	const template = loadTemplate('certificateChanged');
-	return template(data);
+	return { html: template.html(data), text: template.text(data) };
+}
+
+interface EmailContent {
+	html: string;
+	text: string;
 }
 
 export type {

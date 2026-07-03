@@ -1,0 +1,22 @@
+certs.email
+
+{{#if isCritical}}
+{{#if isExpired}}Your certificate for {{domain}} is now EXPIRED.{{else}}Your certificate for {{domain}} expires {{expiresIn}}.{{/if}}
+{{else}}
+Your certificate for {{domain}} expires {{expiresIn}}.
+{{/if}}
+
+CERTIFICATE DETAILS:
+
+Domain: {{domain}}
+Issuer: {{issuer}}
+CN: {{#if cn}}{{cn}}{{else}}-{{/if}}
+SAN: {{#if san.length}}{{#each san}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}-{{/if}}
+Serial: {{#if serial}}{{serial}}{{else}}-{{/if}}
+Valid from: {{validFrom}}
+Valid until: {{validUntil}}
+
+You're receiving this email because you've subscribed to certificate expiration notifications on certs.email.
+
+Unsubscribe or change settings:
+{{settingsUrl}}

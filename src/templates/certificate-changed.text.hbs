@@ -1,0 +1,29 @@
+certs.email
+
+Certificate changed: {{domain}}
+Detected at {{firstDetectedDate}}
+
+OLD CERTIFICATE:
+
+Domain: {{oldCert.domain}}
+Issuer: {{oldCert.issuer}}
+CN: {{#if oldCert.cn}}{{oldCert.cn}}{{else}}-{{/if}}
+SAN: {{#if oldCert.san.length}}{{#each oldCert.san}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}-{{/if}}
+Serial: {{#if oldCert.serial}}{{oldCert.serial}}{{else}}-{{/if}}
+Valid from: {{oldCert.validFrom}}
+Valid until: {{oldCert.validUntil}}
+
+NEW CERTIFICATE:
+
+Domain: {{newCert.domain}}
+Issuer: {{newCert.issuer}}
+CN: {{#if newCert.cn}}{{newCert.cn}}{{else}}-{{/if}}
+SAN: {{#if newCert.san.length}}{{#each newCert.san}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}-{{/if}}
+Serial: {{#if newCert.serial}}{{newCert.serial}}{{else}}-{{/if}}
+Valid from: {{newCert.validFrom}}
+Valid until: {{newCert.validUntil}}
+
+You're receiving this email because you've subscribed to certificate expiration notifications on certs.email.
+
+Unsubscribe or change settings:
+{{settingsUrl}}

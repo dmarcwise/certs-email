@@ -116,31 +116,37 @@ const previewData = {
 	}
 };
 
-export const GET: RequestHandler = async ({ params }) => {
+export const GET: RequestHandler = async ({ params, url }) => {
 	const { template } = params;
 
-	let html: string;
+	let content: { html: string; text: string };
 	if (template === 'confirmation') {
-		html = renderConfirmationEmail(previewData.confirmation);
+		content = renderConfirmationEmail(previewData.confirmation);
 	} else if (template === 'confirmed-domains') {
-		html = renderConfirmedDomainsEmail(previewData['confirmed-domains']);
+		content = renderConfirmedDomainsEmail(previewData['confirmed-domains']);
 	} else if (template === 'heartbeat') {
-		html = renderHeartbeatEmail(previewData.heartbeat());
+		content = renderHeartbeatEmail(previewData.heartbeat());
 	} else if (template === 'expiring') {
-		html = renderExpiringDomainEmail(previewData.expiring);
+		content = renderExpiringDomainEmail(previewData.expiring);
 	} else if (template === 'expiring-warning') {
-		html = renderExpiringDomainEmail(previewData['expiring-warning']);
+		content = renderExpiringDomainEmail(previewData['expiring-warning']);
 	} else if (template === 'expiring-expired') {
-		html = renderExpiringDomainEmail(previewData['expiring-expired']);
+		content = renderExpiringDomainEmail(previewData['expiring-expired']);
 	} else if (template === 'certificate-changed') {
-		html = renderCertificateChangedEmail(previewData['certificate-changed']);
+		content = renderCertificateChangedEmail(previewData['certificate-changed']);
 	} else {
 		throw error(404, `Template '${template}' not found`);
 	}
 
-	return new Response(html, {
+	const format = url.searchParams.get('format');
+	if (format !== null && format !== 'html' && format !== 'text') {
+		throw error(400, "Format must be either 'html' or 'text'");
+	}
+
+	const isText = format === 'text';
+	return new Response(isText ? content.text : content.html, {
 		headers: {
-			'Content-Type': 'text/html'
+			'Content-Type': isText ? 'text/plain; charset=utf-8' : 'text/html; charset=utf-8'
 		}
 	});
 };

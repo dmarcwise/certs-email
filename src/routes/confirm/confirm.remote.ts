@@ -71,13 +71,14 @@ export const confirm = form(
 
 async function queueConfirmedDomainsEmail(to: string, domains: string[], settingsToken: string) {
 	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
-	const html = renderConfirmedDomainsEmail({ domains, settingsUrl });
+	const { html, text } = renderConfirmedDomainsEmail({ domains, settingsUrl });
 
 	await db.emailOutbox.create({
 		data: {
 			recipients: [to],
 			subject: 'Your domains are now being monitored',
 			body: html,
+			textBody: text,
 			templateName: 'Confirmed',
 			priority: EmailOutboxPriorities.Low
 		}

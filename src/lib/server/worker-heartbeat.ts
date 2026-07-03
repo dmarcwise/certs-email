@@ -109,7 +109,7 @@ async function queueHeartbeatEmail(
 	settingsToken: string
 ) {
 	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
-	const html = renderHeartbeatEmail({
+	const { html, text } = renderHeartbeatEmail({
 		generatedDate,
 		critical,
 		warning,
@@ -125,6 +125,7 @@ async function queueHeartbeatEmail(
 			recipients: [to],
 			subject: 'Your certificate status report',
 			body: html,
+			textBody: text,
 			templateName: 'Heartbeat',
 			priority: EmailOutboxPriorities.Low
 		}

@@ -7,3 +7,6 @@ bun.lockb
 
 # Miscellaneous
 /static/
+
+# Plain-text email formatting is intentional
+src/templates/*.text.hbs
