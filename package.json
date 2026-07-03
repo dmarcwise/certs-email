@@ -51,7 +51,6 @@
 		"ipaddr.js": "^2.2.0",
 		"juice": "^11.1.0",
 		"lettermint": "^1.5.1",
-		"mailtrap": "^4.4.0",
 		"mode-watcher": "^1.1.0",
 		"pg": "^8.16.3",
 		"pino": "^10.1.1",

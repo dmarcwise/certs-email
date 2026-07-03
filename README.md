@@ -33,7 +33,7 @@ node build
 ### Environment variables
 
 - `DATABASE_URL`: PostgreSQL connection string.
-- `MAILTRAP_API_KEY`: Mailtrap API token for sending email.
+- `LETTERMINT_API_TOKEN`: Lettermint API token for sending email.
 - `WEBSITE_URL`: Base URL used in email links.
 - `PORT`: HTTP port for the Node server (defaults to `3000`).
 
