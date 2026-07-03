@@ -36,6 +36,14 @@ function parseSan(subjectAltName: string | undefined): string[] {
 		.filter(Boolean);
 }
 
+function formatName(value: string | string[] | undefined): string | null {
+	if (Array.isArray(value)) {
+		return value.join(', ') || null;
+	} else {
+		return value || null;
+	}
+}
+
 export async function fetchCertificate(
 	hostname: string,
 	port: number,
@@ -114,8 +122,8 @@ export async function fetchCertificate(
 				resolveOnce({
 					notBefore: new Date(cert.valid_from),
 					notAfter: new Date(cert.valid_to),
-					issuer: (cert.issuer.O ?? cert.issuer.CN) || null,
-					cn: cert.subject.CN || null,
+					issuer: formatName(cert.issuer.O ?? cert.issuer.CN),
+					cn: formatName(cert.subject.CN),
 					san: parseSan(cert.subjectaltname),
 					serial: cert.serialNumber || null,
 					fingerprint256: cert.fingerprint256 || null,
