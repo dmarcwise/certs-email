@@ -8,6 +8,8 @@
 </script>
 
 <textarea
-	class={cn("rounded border-blue-800 border-2 px-4 py-2 focus:outline-none focus:ring-3 focus:ring-blue-200 dark:focus:ring-blue-950 transition-shadow", inputClass)}
-	{...restProps}
-></textarea>
+	class={cn(
+		'rounded border-2 border-blue-800 px-4 py-2 transition-shadow focus:ring-3 focus:ring-blue-200 focus:outline-none dark:focus:ring-blue-950',
+		inputClass,
+	)}
+	{...restProps}></textarea>

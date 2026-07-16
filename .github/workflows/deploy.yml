@@ -32,7 +32,7 @@ jobs:
         with:
           file: Dockerfile
           push: true
-          tags: "ghcr.io/${{ github.repository }}:${{ github.sha }}"
+          tags: 'ghcr.io/${{ github.repository }}:${{ github.sha }}'
   PROD-deploy:
     name: '[PROD] Deploy'
     runs-on: ubuntu-latest

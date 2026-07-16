@@ -47,7 +47,7 @@ function formatName(value: string | string[] | undefined): string | null {
 export async function fetchCertificate(
 	hostname: string,
 	port: number,
-	timeoutMs: number = DEFAULT_TIMEOUT_MS
+	timeoutMs: number = DEFAULT_TIMEOUT_MS,
 ): Promise<CertificateInfo> {
 	return new Promise((resolve, reject) => {
 		let settled = false;
@@ -70,8 +70,8 @@ export async function fetchCertificate(
 			callback: (
 				err: NodeJS.ErrnoException | null,
 				address: string | dns.LookupAddress[],
-				family?: number
-			) => void
+				family?: number,
+			) => void,
 		) => {
 			dns.lookup(hostname, { family: 4, all: true }, (error, addresses) => {
 				if (error) {
@@ -100,7 +100,7 @@ export async function fetchCertificate(
 				port,
 				servername: hostname,
 				rejectUnauthorized: false,
-				lookup
+				lookup,
 			},
 			() => {
 				let cert: PeerCertificate | undefined;
@@ -127,9 +127,9 @@ export async function fetchCertificate(
 					san: parseSan(cert.subjectaltname),
 					serial: cert.serialNumber || null,
 					fingerprint256: cert.fingerprint256 || null,
-					ip: remoteAddress ?? null
+					ip: remoteAddress ?? null,
 				});
-			}
+			},
 		);
 
 		socket.setTimeout(timeoutMs, () => {

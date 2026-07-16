@@ -17,7 +17,7 @@ const templates: Record<string, { html: string; text: string }> = {
 	confirmedDomains: { html: confirmedDomainsTemplate, text: confirmedDomainsTextTemplate },
 	heartbeat: { html: heartbeatTemplate, text: heartbeatTextTemplate },
 	expiringDomain: { html: expiringDomainTemplate, text: expiringDomainTextTemplate },
-	certificateChanged: { html: certificateChangedTemplate, text: certificateChangedTextTemplate }
+	certificateChanged: { html: certificateChangedTemplate, text: certificateChangedTextTemplate },
 };
 
 // Cache for compiled templates with inlined CSS
@@ -38,12 +38,12 @@ function loadTemplate(name: string) {
 
 	// Inline CSS using css-inline with common styles injected
 	const inlinedHtml = juice(template.html, {
-		extraCss: commonStyles
+		extraCss: commonStyles,
 	});
 
 	const compiled = {
 		html: Handlebars.compile(inlinedHtml),
-		text: Handlebars.compile(template.text, { noEscape: true })
+		text: Handlebars.compile(template.text, { noEscape: true }),
 	};
 
 	// Cache it
@@ -162,5 +162,5 @@ export type {
 	PendingDomainInfo,
 	ErrorDomainInfo,
 	ExpiringDomainEmailData,
-	CertificateChangedEmailData
+	CertificateChangedEmailData,
 };

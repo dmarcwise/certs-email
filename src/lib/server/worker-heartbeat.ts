@@ -16,7 +16,7 @@ export async function runHeartbeat() {
 	const now = new Date();
 	const users = await db.user.findMany({
 		where: { confirmed: true, sendHeartbeatReport: true },
-		include: { domains: { where: { confirmed: true } } }
+		include: { domains: { where: { confirmed: true } } },
 	});
 
 	logger.info(`Found ${users.length} users to consider for heartbeat report`);
@@ -36,14 +36,14 @@ export async function runHeartbeat() {
 			Boolean(domain.error && domain.errorStartedAt && domain.errorStartedAt <= errorCutoff);
 		const domainsInError = user.domains.filter(isErrorDomain).map((domain) => ({
 			domain: domain.name,
-			error: domain.error!
+			error: domain.error!,
 		}));
 		const activeDomains = user.domains.filter((domain) => !isErrorDomain(domain));
 
 		const pending = activeDomains
 			.filter((domain) => domain.status === DomainStatus.PENDING)
 			.map((domain) => ({
-				domain: domain.name
+				domain: domain.name,
 			}));
 
 		const domainInfo = activeDomains
@@ -57,7 +57,7 @@ export async function runHeartbeat() {
 					expiresIn: formatExpiresIn(daysRemaining, status),
 					expiresDate: formatExpirationDate(expirationDate),
 					issuer: domain.issuer,
-					status
+					status,
 				};
 			});
 
@@ -65,13 +65,13 @@ export async function runHeartbeat() {
 			(domain) =>
 				domain.status === DomainStatus.EXPIRED ||
 				domain.status === DomainStatus.EXPIRING_1DAY ||
-				domain.status === DomainStatus.EXPIRING_7DAYS
+				domain.status === DomainStatus.EXPIRING_7DAYS,
 		);
 
 		const warning = domainInfo.filter(
 			(domain) =>
 				domain.status === DomainStatus.EXPIRING_14DAYS ||
-				domain.status === DomainStatus.EXPIRING_30DAYS
+				domain.status === DomainStatus.EXPIRING_30DAYS,
 		);
 
 		const healthy = domainInfo.filter((domain) => domain.status === DomainStatus.OK);
@@ -87,12 +87,12 @@ export async function runHeartbeat() {
 			healthy,
 			pending,
 			user.domains.length,
-			user.settingsToken
+			user.settingsToken,
 		);
 
 		await db.user.update({
 			where: { id: user.id },
-			data: { lastHeartbeatSentAt: now }
+			data: { lastHeartbeatSentAt: now },
 		});
 	}
 }
@@ -106,7 +106,7 @@ async function queueHeartbeatEmail(
 	healthy: { domain: string; expiresIn: string; expiresDate: string; issuer: string | null }[],
 	pending: { domain: string }[],
 	totalDomains: number,
-	settingsToken: string
+	settingsToken: string,
 ) {
 	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
 	const { html, text } = renderHeartbeatEmail({
@@ -117,7 +117,7 @@ async function queueHeartbeatEmail(
 		healthy,
 		pending,
 		totalDomains,
-		settingsUrl
+		settingsUrl,
 	});
 
 	await db.emailOutbox.create({
@@ -127,7 +127,7 @@ async function queueHeartbeatEmail(
 			body: html,
 			textBody: text,
 			templateName: 'Heartbeat',
-			priority: EmailOutboxPriorities.Low
-		}
+			priority: EmailOutboxPriorities.Low,
+		},
 	});
 }
