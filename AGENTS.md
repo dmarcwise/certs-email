@@ -12,7 +12,11 @@ This repository contains the full-stack frontend application:
 
 ## Verifying changes:
 
-When you make a change, you should use `npm run check` to verify you didn't make mistakes.
+The code must pass Svelte checks, formatting, and linting before committing:
+
+- Run `npm run check` to catch TypeScript, a11y, and Svelte compiler errors.
+- Run `npm run format` to format your changes with Prettier before finishing.
+- Run `npm run lint` to check formatting and ESLint together.
 
 ## Imports
 
