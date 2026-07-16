@@ -11,12 +11,12 @@ const logger = createLogger('confirm');
 
 export const confirm = form(
 	z.object({
-		token: z.string()
+		token: z.string(),
 	}),
 	async ({ token }, issue) => {
 		// Find user by confirmation token
 		const user = await db.user.findUnique({
-			where: { confirmToken: token }
+			where: { confirmToken: token },
 		});
 
 		if (!user) {
@@ -34,25 +34,25 @@ export const confirm = form(
 			data: {
 				confirmed: true,
 				confirmToken: null,
-				confirmTokenExpiresAt: null
-			}
+				confirmTokenExpiresAt: null,
+			},
 		});
 
 		// Confirm all unconfirmed domains
 		await db.domain.updateMany({
 			where: {
 				userId: user.id,
-				confirmed: false
+				confirmed: false,
 			},
 			data: {
-				confirmed: true
-			}
+				confirmed: true,
+			},
 		});
 
 		// Get all domains after confirmation
 		const confirmedUser = await db.user.findUnique({
 			where: { id: user.id },
-			include: { domains: true }
+			include: { domains: true },
 		});
 
 		// Send email with confirmed domains list
@@ -61,12 +61,12 @@ export const confirm = form(
 			await queueConfirmedDomainsEmail(
 				confirmedUser.email,
 				confirmedUser.domains.map((d) => d.name),
-				confirmedUser.settingsToken
+				confirmedUser.settingsToken,
 			);
 		}
 
 		redirect(303, '/confirmed');
-	}
+	},
 );
 
 async function queueConfirmedDomainsEmail(to: string, domains: string[], settingsToken: string) {
@@ -80,7 +80,7 @@ async function queueConfirmedDomainsEmail(to: string, domains: string[], setting
 			body: html,
 			textBody: text,
 			templateName: 'Confirmed',
-			priority: EmailOutboxPriorities.Low
-		}
+			priority: EmailOutboxPriorities.Low,
+		},
 	});
 }

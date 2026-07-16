@@ -20,14 +20,14 @@
 </svelte:head>
 
 <div class="container py-8">
-
-	<h1 class="text-blue-800 dark:text-blue-600 font-semibold tracking-wide text-4xl">
-		<a href={resolve('/')}
-			 class="hover:underline underline-offset-4 decoration-2 decoration-blue-800 dark:decoration-blue-600">
+	<h1 class="text-4xl font-semibold tracking-wide text-blue-800 dark:text-blue-600">
+		<a
+			href={resolve('/')}
+			class="decoration-blue-800 decoration-2 underline-offset-4 hover:underline dark:decoration-blue-600"
+		>
 			certs.email
 		</a>
 	</h1>
-
 </div>
 
 {@render children()}

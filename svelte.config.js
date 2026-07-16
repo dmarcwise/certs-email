@@ -11,18 +11,18 @@ const config = {
 		adapter: adapter(),
 		alias: {
 			$templates: 'src/templates',
-			$prisma: 'src/prisma'
+			$prisma: 'src/prisma',
 		},
 		experimental: {
-			remoteFunctions: true
-		}
+			remoteFunctions: true,
+		},
 	},
 
 	compilerOptions: {
 		experimental: {
-			async: true
-		}
-	}
+			async: true,
+		},
+	},
 };
 
 export default config;

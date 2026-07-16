@@ -12,7 +12,7 @@ import { env } from '$env/dynamic/private';
 const logger = createLogger('submit');
 
 const domainRegex = new RegExp(
-	'^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$'
+	'^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$',
 );
 
 const MAX_DOMAINS_PER_USER = 20;
@@ -23,7 +23,7 @@ export const submit = form(
 		email: z.email(),
 		settingsToken: z.string().optional(),
 		sendCertChangeAlerts: z.boolean().optional(),
-		sendHeartbeatReport: z.boolean().optional()
+		sendHeartbeatReport: z.boolean().optional(),
 	}),
 	async ({ domains, email, settingsToken, sendCertChangeAlerts, sendHeartbeatReport }, issue) => {
 		// Parse and validate domains
@@ -48,7 +48,7 @@ export const submit = form(
 		if (isEdit) {
 			const user = await db.user.findUnique({
 				where: { settingsToken },
-				include: { domains: true }
+				include: { domains: true },
 			});
 
 			if (!user) {
@@ -58,8 +58,8 @@ export const submit = form(
 			if (uniqueDomains.length > MAX_DOMAINS_PER_USER) {
 				invalid(
 					issue.domains(
-						`You can only monitor up to ${MAX_DOMAINS_PER_USER} domains. Your updated list has ${uniqueDomains.length}.`
-					)
+						`You can only monitor up to ${MAX_DOMAINS_PER_USER} domains. Your updated list has ${uniqueDomains.length}.`,
+					),
 				);
 			}
 
@@ -73,8 +73,8 @@ export const submit = form(
 				await db.domain.deleteMany({
 					where: {
 						userId: user.id,
-						name: { in: domainsToRemove }
-					}
+						name: { in: domainsToRemove },
+					},
 				});
 			}
 
@@ -84,8 +84,8 @@ export const submit = form(
 						userId: user.id,
 						name,
 						confirmed: user.confirmed,
-						status: DomainStatus.PENDING
-					}))
+						status: DomainStatus.PENDING,
+					})),
 				});
 			}
 
@@ -95,13 +95,13 @@ export const submit = form(
 				where: { id: user.id },
 				data: {
 					sendCertChangeAlerts: sendCertChangeAlerts ?? false,
-					sendHeartbeatReport: sendHeartbeatReport ?? false
-				}
+					sendHeartbeatReport: sendHeartbeatReport ?? false,
+				},
 			});
 
 			logger.info(
 				{ email: user.email, domainCount: uniqueDomains.length },
-				`Settings updated for user ${user.email}`
+				`Settings updated for user ${user.email}`,
 			);
 
 			redirect(303, `/success?message=updated`);
@@ -114,7 +114,7 @@ export const submit = form(
 		// Find or create user
 		let user = await db.user.findUnique({
 			where: { email },
-			include: { domains: true }
+			include: { domains: true },
 		});
 
 		const isNewUser = !user;
@@ -132,9 +132,9 @@ export const submit = form(
 					confirmTokenExpiresAt: expiresAt,
 					settingsToken,
 					sendHeartbeatReport: true,
-					sendCertChangeAlerts: true
+					sendCertChangeAlerts: true,
 				},
-				include: { domains: true }
+				include: { domains: true },
 			});
 		}
 
@@ -146,8 +146,8 @@ export const submit = form(
 			const remaining = MAX_DOMAINS_PER_USER - currentDomainCount;
 			invalid(
 				issue.domains(
-					`You can only monitor up to ${MAX_DOMAINS_PER_USER} domains. You currently have ${currentDomainCount} domain(s), so you can add ${remaining} more.`
-				)
+					`You can only monitor up to ${MAX_DOMAINS_PER_USER} domains. You currently have ${currentDomainCount} domain(s), so you can add ${remaining} more.`,
+				),
 			);
 		}
 
@@ -164,8 +164,8 @@ export const submit = form(
 					userId,
 					name,
 					confirmed: false, // Requires email confirmation
-					status: DomainStatus.PENDING
-				}))
+					status: DomainStatus.PENDING,
+				})),
 			});
 		}
 
@@ -177,9 +177,9 @@ export const submit = form(
 				where: { id: user.id },
 				data: {
 					confirmToken: token,
-					confirmTokenExpiresAt: expiresAt
+					confirmTokenExpiresAt: expiresAt,
 				},
-				include: { domains: true }
+				include: { domains: true },
 			});
 		}
 
@@ -190,7 +190,7 @@ export const submit = form(
 		}
 
 		redirect(303, '/success');
-	}
+	},
 );
 
 async function queueConfirmationEmail(to: string, confirmToken: string) {
@@ -204,7 +204,7 @@ async function queueConfirmationEmail(to: string, confirmToken: string) {
 			body: html,
 			textBody: text,
 			templateName: 'Confirmation',
-			priority: EmailOutboxPriorities.High
-		}
+			priority: EmailOutboxPriorities.High,
+		},
 	});
 }

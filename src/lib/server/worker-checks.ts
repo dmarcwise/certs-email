@@ -2,7 +2,10 @@ import { db } from '$lib/server/db';
 import { Prisma } from '$prisma/generated/client';
 import { DomainStatus } from '$prisma/generated/enums';
 import { formatExpirationDate, formatExpiresIn } from '$lib/server/utils';
-import { renderExpiringDomainEmail, renderCertificateChangedEmail } from '$lib/server/email-templates';
+import {
+	renderExpiringDomainEmail,
+	renderCertificateChangedEmail,
+} from '$lib/server/email-templates';
 import { EmailOutboxPriorities } from '$lib/server/email';
 import { createLogger } from '$lib/server/logger';
 import { CertFetchError, type CertificateInfo, fetchCertificate } from '$lib/server/fetch-cert';
@@ -24,24 +27,24 @@ const EXPIRATION_EMAIL_METADATA: Record<
 > = {
 	[DomainStatus.EXPIRING_30DAYS]: {
 		isCritical: false,
-		subject: 'Certificate expiring in 30 days'
+		subject: 'Certificate expiring in 30 days',
 	},
 	[DomainStatus.EXPIRING_14DAYS]: {
 		isCritical: false,
-		subject: 'Certificate expiring in 14 days'
+		subject: 'Certificate expiring in 14 days',
 	},
 	[DomainStatus.EXPIRING_7DAYS]: {
 		isCritical: true,
-		subject: 'Certificate expiring in 7 days'
+		subject: 'Certificate expiring in 7 days',
 	},
 	[DomainStatus.EXPIRING_1DAY]: {
 		isCritical: true,
-		subject: 'Certificate expiring in 1 day'
+		subject: 'Certificate expiring in 1 day',
 	},
 	[DomainStatus.EXPIRED]: {
 		isCritical: true,
-		subject: 'Certificate expired'
-	}
+		subject: 'Certificate expired',
+	},
 };
 
 const NOTIFY_STATUSES = new Set<DomainStatus>([
@@ -49,7 +52,7 @@ const NOTIFY_STATUSES = new Set<DomainStatus>([
 	DomainStatus.EXPIRING_14DAYS,
 	DomainStatus.EXPIRING_7DAYS,
 	DomainStatus.EXPIRING_1DAY,
-	DomainStatus.EXPIRED
+	DomainStatus.EXPIRED,
 ]);
 
 const logger = createLogger('worker-checks');
@@ -61,9 +64,9 @@ export async function runChecks() {
 		where: {
 			confirmed: true,
 			user: { confirmed: true },
-			OR: [{ lastCheckedAt: null }, { lastCheckedAt: { lt: staleBefore } }]
+			OR: [{ lastCheckedAt: null }, { lastCheckedAt: { lt: staleBefore } }],
 		},
-		include: { user: true }
+		include: { user: true },
 	});
 
 	logger.info(`Found ${domains.length} domains to process`);
@@ -89,7 +92,7 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 			dbErrorMessage = 'Unknown error';
 			logger.error(
 				error,
-				`[${domain.name}] Unknown error while fetching certificate for domain, continuing`
+				`[${domain.name}] Unknown error while fetching certificate for domain, continuing`,
 			);
 		}
 
@@ -97,24 +100,23 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 			db.check.create({
 				data: {
 					domainId: domain.id,
-					error: dbErrorMessage
-				}
+					error: dbErrorMessage,
+				},
 			}),
 			db.domain.update({
 				where: { id: domain.id },
 				data: {
 					lastCheckedAt: now,
 					error: dbErrorMessage,
-					errorStartedAt: domain.errorStartedAt ?? now
-				}
-			})
+					errorStartedAt: domain.errorStartedAt ?? now,
+				},
+			}),
 		]);
 		return;
 	}
 
 	// Detect certificate change
-	const certChanged =
-		domain.fingerprint !== null && domain.fingerprint !== cert.fingerprint256;
+	const certChanged = domain.fingerprint !== null && domain.fingerprint !== cert.fingerprint256;
 
 	if (certChanged) {
 		logger.info(`[${domain.name}] Certificate changed detected`);
@@ -129,7 +131,7 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 					issuer: domain.issuer,
 					cn: domain.cn,
 					san: domain.san,
-					serial: domain.serial
+					serial: domain.serial,
 				},
 				{
 					notBefore: cert.notBefore,
@@ -137,13 +139,13 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 					issuer: cert.issuer,
 					cn: cert.cn,
 					san: cert.san,
-					serial: cert.serial
+					serial: cert.serial,
 				},
-				domain.user.settingsToken
+				domain.user.settingsToken,
 			);
 		} else {
 			logger.info(
-				`[${domain.name}] Skipping certificate change notification - user disabled alerts`
+				`[${domain.name}] Skipping certificate change notification - user disabled alerts`,
 			);
 		}
 	}
@@ -155,7 +157,7 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 	if (shouldNotify) {
 		const daysRemaining = Math.ceil((cert.notAfter.getTime() - now.getTime()) / 86_400_000);
 		logger.info(
-			`[${domain.name}] Sending notification for new status: ${nextStatus} (${daysRemaining} days remaining)`
+			`[${domain.name}] Sending notification for new status: ${nextStatus} (${daysRemaining} days remaining)`,
 		);
 		await queueExpiringDomainEmail(
 			domain.user.email,
@@ -167,7 +169,7 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 			cert.cn,
 			cert.san,
 			cert.serial,
-			domain.user.settingsToken
+			domain.user.settingsToken,
 		);
 	}
 
@@ -182,8 +184,8 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 				san: cert.san,
 				serial: cert.serial,
 				fingerprint: cert.fingerprint256,
-				ip: cert.ip
-			}
+				ip: cert.ip,
+			},
 		}),
 		db.domain.update({
 			where: { id: domain.id },
@@ -201,9 +203,9 @@ async function checkDomain(domain: DomainWithUser, now: Date) {
 				error: null,
 				errorStartedAt: null,
 				lastNotifiedAt: shouldNotify ? now : domain.lastNotifiedAt,
-				lastCertChangeNotifiedAt: certChanged ? now : domain.lastCertChangeNotifiedAt
-			}
-		})
+				lastCertChangeNotifiedAt: certChanged ? now : domain.lastCertChangeNotifiedAt,
+			},
+		}),
 	]);
 }
 
@@ -217,7 +219,7 @@ async function queueExpiringDomainEmail(
 	cn: string | null,
 	san: string[],
 	serial: string | null,
-	settingsToken: string
+	settingsToken: string,
 ) {
 	const metadata = EXPIRATION_EMAIL_METADATA[status];
 	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
@@ -234,7 +236,7 @@ async function queueExpiringDomainEmail(
 		serial,
 		settingsUrl,
 		isCritical: metadata.isCritical,
-		isExpired: status === DomainStatus.EXPIRED
+		isExpired: status === DomainStatus.EXPIRED,
 	});
 
 	await db.emailOutbox.create({
@@ -244,8 +246,8 @@ async function queueExpiringDomainEmail(
 			body: html,
 			textBody: text,
 			templateName: 'Expiring',
-			priority: EmailOutboxPriorities.Medium
-		}
+			priority: EmailOutboxPriorities.Medium,
+		},
 	});
 }
 
@@ -268,7 +270,7 @@ async function queueCertificateChangedEmail(
 		san: string[];
 		serial: string | null;
 	},
-	settingsToken: string
+	settingsToken: string,
 ) {
 	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
 
@@ -282,7 +284,7 @@ async function queueCertificateChangedEmail(
 			validUntil: formatExpirationDate(oldCert.notAfter!),
 			serial: oldCert.serial,
 			cn: oldCert.cn,
-			san: oldCert.san
+			san: oldCert.san,
 		},
 		newCert: {
 			domain: newCert.cn || domain,
@@ -291,9 +293,9 @@ async function queueCertificateChangedEmail(
 			validUntil: formatExpirationDate(newCert.notAfter),
 			serial: newCert.serial,
 			cn: newCert.cn,
-			san: newCert.san
+			san: newCert.san,
 		},
-		settingsUrl
+		settingsUrl,
 	});
 
 	await db.emailOutbox.create({
@@ -303,7 +305,7 @@ async function queueCertificateChangedEmail(
 			body: html,
 			textBody: text,
 			templateName: 'CertificateChanged',
-			priority: EmailOutboxPriorities.Medium
-		}
+			priority: EmailOutboxPriorities.Medium,
+		},
 	});
 }

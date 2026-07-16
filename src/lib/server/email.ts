@@ -14,12 +14,15 @@ function getLettermint() {
 	return lettermint;
 }
 
-const defaultFrom = { name: 'certs.email', email: dev ? 'support@dev.certs.email' : 'support@certs.email' };
+const defaultFrom = {
+	name: 'certs.email',
+	email: dev ? 'support@dev.certs.email' : 'support@certs.email',
+};
 
 export const EmailOutboxPriorities = {
 	High: 0,
 	Medium: 5,
-	Low: 10
+	Low: 10,
 } as const;
 
 async function sendEmail(options: {
@@ -52,6 +55,6 @@ export async function sendQueuedEmail(job: EmailOutbox) {
 		subject: job.subject,
 		html: job.body,
 		text: job.textBody ?? undefined,
-		tag
+		tag,
 	});
 }

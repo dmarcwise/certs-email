@@ -12,7 +12,7 @@
 <div class="mt-6">
 	<h3 class="font-medium">{title}</h3>
 
-	<article class="flex flex-col gap-2 mt-2">
+	<article class="mt-2 flex flex-col gap-2">
 		{@render children?.()}
 	</article>
 </div>

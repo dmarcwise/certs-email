@@ -9,8 +9,8 @@ const loggerConfig: LoggerOptions = {
 	messageKey: 'message',
 	errorKey: 'error',
 	formatters: {
-		level: (label: string) => ({ level: label })
-	}
+		level: (label: string) => ({ level: label }),
+	},
 };
 
 if (dev) {
@@ -20,8 +20,8 @@ if (dev) {
 			colorize: true,
 			singleLine: true,
 			messageKey: 'message',
-			timestampKey: 'timestamp'
-		} as PrettyOptions
+			timestampKey: 'timestamp',
+		} as PrettyOptions,
 	};
 }
 

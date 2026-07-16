@@ -11,7 +11,8 @@
 
 	const { data } = $props();
 
-	const { domains, email, settingsToken, sendCertChangeAlerts, sendHeartbeatReport } = submit.fields;
+	const { domains, email, settingsToken, sendCertChangeAlerts, sendHeartbeatReport } =
+		submit.fields;
 	const { settingsToken: unsubscribeToken } = unsubscribe.fields;
 
 	let submitError = $state(false);
@@ -24,21 +25,21 @@
 				email: data.edit.email,
 				settingsToken: data.edit.token,
 				sendCertChangeAlerts: data.edit.sendCertChangeAlerts,
-				sendHeartbeatReport: data.edit.sendHeartbeatReport
+				sendHeartbeatReport: data.edit.sendHeartbeatReport,
 			});
 
 			unsubscribe.fields.set({
-				settingsToken: data.edit.token
+				settingsToken: data.edit.token,
 			});
 		} else {
 			submit.fields.set({
 				domains: '',
 				email: '',
-				settingsToken: ''
+				settingsToken: '',
 			});
 
 			unsubscribe.fields.set({
-				settingsToken: ''
+				settingsToken: '',
 			});
 
 			submitError = false;
@@ -71,41 +72,51 @@
 			Update the domains monitored for <span class="font-medium">{data.edit.email}</span>.
 		</p>
 
-		<p class="mt-2">
-			Submitting this form will replace your current list of monitored domains.
-		</p>
+		<p class="mt-2">Submitting this form will replace your current list of monitored domains.</p>
 	{:else}
 		<p>
-			certs.email is a simple tool for <span class="font-medium">automated SSL/TLS certificates monitoring</span>.
+			certs.email is a simple tool for <span class="font-medium"
+				>automated SSL/TLS certificates monitoring</span
+			>.
 		</p>
 
 		<p class="mt-4">Enter your domain names and email address and we'll send you:</p>
 
-		<ul class="mt-2 space-y-1 list-inside list-disc">
+		<ul class="mt-2 list-inside list-disc space-y-1">
 			<li>
-				Expiration notifications 30 days, 14 days, 7 days and 1 day before the date
-				(<a href={resolve('/preview/expiring')} class="link">preview</a>).
+				Expiration notifications 30 days, 14 days, 7 days and 1 day before the date (<a
+					href={resolve('/preview/expiring')}
+					class="link">preview</a
+				>).
 			</li>
 			<li>
-				Certificate change notifications when your certificate is replaced
-				(<a href={resolve('/preview/certificate-changed')} class="link">preview</a>).
-				<span class="uppercase text-white bg-blue-800 text-xs rounded px-1.25 py-px cursor-default">Optional</span>
+				Certificate change notifications when your certificate is replaced (<a
+					href={resolve('/preview/certificate-changed')}
+					class="link">preview</a
+				>).
+				<span class="cursor-default rounded bg-blue-800 px-1.25 py-px text-xs text-white uppercase"
+					>Optional</span
+				>
 			</li>
 			<li>
-				Heartbeat reports with the status of your certificates every 2 weeks
-				(<a href={resolve('/preview/heartbeat')} class="link">preview</a>).
-				<span class="uppercase text-white bg-blue-800 text-xs rounded px-1.25 py-px cursor-default">Optional</span>
+				Heartbeat reports with the status of your certificates every 2 weeks (<a
+					href={resolve('/preview/heartbeat')}
+					class="link">preview</a
+				>).
+				<span class="cursor-default rounded bg-blue-800 px-1.25 py-px text-xs text-white uppercase"
+					>Optional</span
+				>
 			</li>
 		</ul>
 	{/if}
 
 	{#if data.isTokenInvalid}
-		<p class="mt-6 text-red-600 font-medium">Invalid or expired settings link.</p>
+		<p class="mt-6 font-medium text-red-600">Invalid or expired settings link.</p>
 	{/if}
 
 	<!-- eslint-disable-next-line svelte/require-each-key -->
 	{#each settingsToken.issues() as issue}
-		<p class="mt-6 text-red-600 font-medium">{issue.message}</p>
+		<p class="mt-6 font-medium text-red-600">{issue.message}</p>
 	{/each}
 
 	<form class="mt-10" {...enhancedSubmit}>
@@ -114,14 +125,14 @@
 		{/if}
 
 		<label class="block">
-			<span class="font-medium">
-				Domain names:
-			</span>
+			<span class="font-medium"> Domain names: </span>
 
-			<Textarea placeholder="Enter your domain names (one per line)"
-								class="mt-2 w-full h-32 min-h-32"
-								required
-								{...domains.as('text')} />
+			<Textarea
+				placeholder="Enter your domain names (one per line)"
+				class="mt-2 h-32 min-h-32 w-full"
+				required
+				{...domains.as('text')}
+			/>
 
 			<!-- eslint-disable-next-line svelte/require-each-key -->
 			{#each domains.issues() as issue}
@@ -129,11 +140,8 @@
 			{/each}
 		</label>
 
-		<label class="block mt-6"
-					 class:hidden={data.edit}>
-			<span class="font-medium">
-				Email address:
-			</span>
+		<label class="mt-6 block" class:hidden={data.edit}>
+			<span class="font-medium"> Email address: </span>
 
 			<Input
 				placeholder="Enter your email address"
@@ -150,33 +158,33 @@
 
 		{#if data.edit}
 			<div class="mt-6">
-				<h3 class="font-medium mb-3">Notification preferences</h3>
+				<h3 class="mb-3 font-medium">Notification preferences</h3>
 
-				<label class="flex items-start gap-3 mb-3 cursor-not-allowed opacity-60">
+				<label class="mb-3 flex cursor-not-allowed items-start gap-3 opacity-60">
 					<Checkbox checked disabled />
 					<div class="flex-1">
 						<span class="font-medium">Expiration alerts</span>
-						<p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+						<p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
 							Always enabled. Receive notifications 30, 14, 7, and 1 day before expiration.
 						</p>
 					</div>
 				</label>
 
-				<label class="flex items-start gap-3 mb-3 cursor-pointer">
+				<label class="mb-3 flex cursor-pointer items-start gap-3">
 					<Checkbox {...sendCertChangeAlerts.as('checkbox')} />
 					<div class="flex-1">
 						<span class="font-medium">Certificate change alerts</span>
-						<p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+						<p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
 							Receive notifications when a certificate is replaced or changed.
 						</p>
 					</div>
 				</label>
 
-				<label class="flex items-start gap-3 cursor-pointer">
+				<label class="flex cursor-pointer items-start gap-3">
 					<Checkbox {...sendHeartbeatReport.as('checkbox')} />
 					<div class="flex-1">
 						<span class="font-medium">Heartbeat reports</span>
-						<p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+						<p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
 							Receive bi-weekly summary reports of all your monitored certificates.
 						</p>
 					</div>
@@ -184,16 +192,19 @@
 			</div>
 		{/if}
 
-		<p class="mt-6 text-sm text-zinc-600 dark:text-zinc-400"
-			 class:hidden={data.edit}>
-			By continuing, you confirm that you have read our <a href={resolve('/privacy-policy')} class="link">Privacy
-			Policy</a>.
+		<p class="mt-6 text-sm text-zinc-600 dark:text-zinc-400" class:hidden={data.edit}>
+			By continuing, you confirm that you have read our <a
+				href={resolve('/privacy-policy')}
+				class="link">Privacy Policy</a
+			>.
 		</p>
 
 		<Button
-			class="mt-6 flex w-full items-center justify-center gap-x-2 {!!submit.pending && 'disabled:cursor-progress'}"
+			class="mt-6 flex w-full items-center justify-center gap-x-2 {!!submit.pending &&
+				'disabled:cursor-progress'}"
 			type="submit"
-			disabled={!!submit.pending}>
+			disabled={!!submit.pending}
+		>
 			<CheckIcon class="size-4" />
 			{#if data.edit}
 				Update monitoring settings
@@ -214,7 +225,8 @@
 			<input type="hidden" {...unsubscribeToken.as('text')} />
 
 			<Button
-				class="flex w-full items-center justify-center gap-x-2 {!!unsubscribe.pending &&'disabled:cursor-progress'}"
+				class="flex w-full items-center justify-center gap-x-2 {!!unsubscribe.pending &&
+					'disabled:cursor-progress'}"
 				variant="danger"
 				type="submit"
 				disabled={!!unsubscribe.pending}
@@ -242,71 +254,67 @@
 		<p>
 			Certificate renewal may seem a solved problem, but we still sometimes
 			<a href="https://x.com/Hetzner_Online/status/2013203208005423387">see</a>
-			website downtime caused by expired certificates, usually because of broken automation
-			or lack of monitoring.
+			website downtime caused by expired certificates, usually because of broken automation or lack of
+			monitoring.
 		</p>
 
 		<p>
-			With Let's Encrypt discontinuing the expiration notifications, we decided to build a simple tool to help
-			people monitor their certificates. We focus on a simple user experience: no account creation is needed!
+			With Let's Encrypt discontinuing the expiration notifications, we decided to build a simple
+			tool to help people monitor their certificates. We focus on a simple user experience: no
+			account creation is needed!
 		</p>
 	</FaqItem>
 
 	<FaqItem title="Is certs.email free?">
 		<p>
 			Yes! certs.email is free and
-			<a href="https://github.com/dmarcwise/certs-email">
-				open source
-			</a>
+			<a href="https://github.com/dmarcwise/certs-email"> open source </a>
 			and allows up to 20 domains per email address.
 		</p>
 	</FaqItem>
 
 	<FaqItem title="Can I trust you?">
 		<p>
-			certs.email is made by the creators of <a href="https://dmarcwise.io">DMARCwise</a>,
-			a DMARC monitoring product used by thousands of companies.
-			<br>
-			Your email address is safe and is used only to send you the notifications. Read our privacy policy <a
-			href={resolve('/privacy-policy')}>here</a>.
+			certs.email is made by the creators of <a href="https://dmarcwise.io">DMARCwise</a>, a DMARC
+			monitoring product used by thousands of companies.
+			<br />
+			Your email address is safe and is used only to send you the notifications. Read our privacy policy
+			<a href={resolve('/privacy-policy')}>here</a>.
 		</p>
 
 		<p>
 			This project is also open source
-			<a href="https://github.com/dmarcwise/certs-email">
-				on GitHub
-			</a>.
+			<a href="https://github.com/dmarcwise/certs-email"> on GitHub </a>.
 		</p>
 	</FaqItem>
 
 	<FaqItem title="Why would I want certificate change alerts and bi-weekly reports?">
 		<p>
-			If this service only sent expiration notifications, you may at some point wonder
-			if it's working at all. This is why by default we also send you a notification
-			when we detect a new certificate for any of your domains, and one status report (heartbeat) every 2 weeks.
+			If this service only sent expiration notifications, you may at some point wonder if it's
+			working at all. This is why by default we also send you a notification when we detect a new
+			certificate for any of your domains, and one status report (heartbeat) every 2 weeks.
 		</p>
 
 		<p>
-			This way, you can be sure that certs.email is actively monitoring your domains,
-			that notifications are still working and that we can reach you correctly (email is all but perfect!).
+			This way, you can be sure that certs.email is actively monitoring your domains, that
+			notifications are still working and that we can reach you correctly (email is all but
+			perfect!).
 		</p>
 
 		<p>
-			If you don't find these additional notifications useful, you can disable them
-			from the settings link you can find in any email we send you.
+			If you don't find these additional notifications useful, you can disable them from the
+			settings link you can find in any email we send you.
 		</p>
 	</FaqItem>
 
 	<FaqItem title="How often do you check my domains?">
-		<p>
-			We check your domains every 6 hours.
-		</p>
+		<p>We check your domains every 6 hours.</p>
 	</FaqItem>
 
 	<FaqItem title="Do you support multiple IPs?">
 		<p>
-			No, we currently only take the first public IPv4 address returned by the DNS lookup for the domain.
+			No, we currently only take the first public IPv4 address returned by the DNS lookup for the
+			domain.
 		</p>
 	</FaqItem>
-
 </main>

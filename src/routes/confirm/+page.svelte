@@ -10,17 +10,19 @@
 
 <main class="container">
 	<p>
-		Click the button below to <span class="font-medium">confirm your email address</span> and start monitoring your
-		domains.
+		Click the button below to <span class="font-medium">confirm your email address</span> and start monitoring
+		your domains.
 	</p>
 
 	<form class="mt-10" {...confirm}>
 		<input type="hidden" {...token.as('text')} value={tokenValue} />
 
 		<Button
-			class="w-full flex items-center justify-center gap-x-2 {!!confirm.pending && 'disabled:cursor-progress'}"
+			class="flex w-full items-center justify-center gap-x-2 {!!confirm.pending &&
+				'disabled:cursor-progress'}"
 			type="submit"
-			disabled={!!confirm.pending}>
+			disabled={!!confirm.pending}
+		>
 			<CheckIcon class="size-4" />
 			Confirm email address
 		</Button>

@@ -10,8 +10,8 @@
 <input
 	type="checkbox"
 	class={cn(
-		"size-5 rounded border-blue-800 text-blue-800 focus:ring-3 focus:ring-blue-200 dark:focus:ring-blue-950 transition-shadow cursor-pointer mt-0.5",
-		checkboxClass
+		'mt-0.5 size-5 cursor-pointer rounded border-blue-800 text-blue-800 transition-shadow focus:ring-3 focus:ring-blue-200 dark:focus:ring-blue-950',
+		checkboxClass,
 	)}
 	{...restProps}
 />

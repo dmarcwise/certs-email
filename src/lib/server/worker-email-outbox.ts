@@ -17,15 +17,15 @@ export async function runEmailOutbox() {
 			status: 'Pending',
 			AND: [
 				{
-					OR: [{ sendAfter: null }, { sendAfter: { lte: new Date() } }]
+					OR: [{ sendAfter: null }, { sendAfter: { lte: new Date() } }],
 				},
 				{
-					OR: [{ retryAfter: null }, { retryAfter: { lte: new Date() } }]
-				}
-			]
+					OR: [{ retryAfter: null }, { retryAfter: { lte: new Date() } }],
+				},
+			],
 		},
 		orderBy: [{ priority: 'asc' }, { createdAt: 'asc' }],
-		take: EMAIL_OUTBOX_BATCH_SIZE
+		take: EMAIL_OUTBOX_BATCH_SIZE,
 	});
 
 	if (jobs.length === 0) {
@@ -50,8 +50,8 @@ async function deliverEmailOutboxJob(job: EmailOutbox) {
 			data: {
 				status: 'Completed',
 				completedAt: new Date(),
-				retryAfter: null
-			}
+				retryAfter: null,
+			},
 		});
 	} catch (error) {
 		const err = error instanceof Error ? error : new Error(String(error));
@@ -62,8 +62,8 @@ async function deliverEmailOutboxJob(job: EmailOutbox) {
 				where: { id: job.id },
 				data: {
 					status: 'Failed',
-					failedAttempts: nextAttempts
-				}
+					failedAttempts: nextAttempts,
+				},
 			});
 
 			logger.error(err, `Email outbox job ${job.id} failed permanently`);
@@ -78,13 +78,13 @@ async function deliverEmailOutboxJob(job: EmailOutbox) {
 			where: { id: job.id },
 			data: {
 				failedAttempts: nextAttempts,
-				retryAfter
-			}
+				retryAfter,
+			},
 		});
 
 		logger.warn(
 			err,
-			`Email outbox job ${job.id} failed; retrying in ${retryDelayMs / 1000} seconds`
+			`Email outbox job ${job.id} failed; retrying in ${retryDelayMs / 1000} seconds`,
 		);
 	}
 }

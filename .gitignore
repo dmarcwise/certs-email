@@ -22,6 +22,13 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-.idea
+# Ignore IDE settings, except the project-level Prettier/ESLint config that
+# every contributor needs. Must be `.idea/*` rather than a bare `.idea`:
+# excluding the directory itself stops git descending into it, so the negations
+# below could not re-include anything. Subdirectories need their own negation
+# before a file inside them can.
+.idea/*
+!.idea/prettier.xml
+!.idea/jsLinters/
 playground
 src/prisma/generated

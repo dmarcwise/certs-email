@@ -10,7 +10,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	const user = await db.user.findUnique({
 		where: { settingsToken },
-		include: { domains: true }
+		include: { domains: true },
 	});
 
 	if (!user) {
@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ url }) => {
 			email: user.email,
 			domains: domains.join('\n'),
 			sendCertChangeAlerts: user.sendCertChangeAlerts,
-			sendHeartbeatReport: user.sendHeartbeatReport
-		}
+			sendHeartbeatReport: user.sendHeartbeatReport,
+		},
 	};
 };

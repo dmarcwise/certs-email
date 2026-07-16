@@ -8,11 +8,11 @@ const logger = createLogger('unsubscribe');
 
 export const unsubscribe = form(
 	z.object({
-		settingsToken: z.string()
+		settingsToken: z.string(),
 	}),
 	async ({ settingsToken }, issue) => {
 		const user = await db.user.findUnique({
-			where: { settingsToken }
+			where: { settingsToken },
 		});
 
 		if (!user) {
@@ -20,11 +20,11 @@ export const unsubscribe = form(
 		}
 
 		await db.user.delete({
-			where: { settingsToken }
+			where: { settingsToken },
 		});
 
 		logger.info({ email: user.email }, `Unsubscribed user ${user.email}`);
 
 		redirect(303, '/success?message=unsubscribed');
-	}
+	},
 );

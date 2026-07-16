@@ -13,7 +13,7 @@ export function startWorker() {
 		CHECK_INTERVAL_MS,
 		() => logger.info('Starting domain checks run...'),
 		() => logger.info('Domain checks finished'),
-		(err) => logger.error(err, 'Domain checks run failed')
+		(err) => logger.error(err, 'Domain checks run failed'),
 	);
 
 	scheduleLoop(
@@ -21,7 +21,7 @@ export function startWorker() {
 		HEARTBEAT_INTERVAL_MS,
 		() => logger.info('Starting heartbeat report run...'),
 		() => logger.info('Heartbeat report finished'),
-		(err) => logger.error(err, 'Heartbeat report run failed')
+		(err) => logger.error(err, 'Heartbeat report run failed'),
 	);
 
 	scheduleLoop(
@@ -29,7 +29,7 @@ export function startWorker() {
 		EMAIL_OUTBOX_POLL_INTERVAL_MS,
 		() => logger.debug('Checking email outbox...'),
 		() => logger.debug('Email outbox poll finished'),
-		(err) => logger.error(err, 'Email outbox poll failed')
+		(err) => logger.error(err, 'Email outbox poll failed'),
 	);
 }
 
@@ -38,7 +38,7 @@ function scheduleLoop(
 	intervalMs: number,
 	onRunStart: () => void = () => {},
 	onRunFinish: () => void = () => {},
-	onRunFail: (error: Error) => void = () => {}
+	onRunFail: (error: Error) => void = () => {},
 ) {
 	let running = false;
 
