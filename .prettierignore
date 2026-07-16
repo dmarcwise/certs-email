@@ -8,5 +8,6 @@ bun.lockb
 # Miscellaneous
 /static/
 
-# Plain-text email formatting is intentional
-src/templates/*.text.hbs
+# Email templates: plain-text formatting is intentional, and Prettier's
+# Handlebars parser mangles the HTML ones (drops <!DOCTYPE>, rewrites quotes).
+src/templates/*.hbs
