@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Button from '$lib/components/button.svelte';
-	import Input from '$lib/components/input.svelte';
-	import Textarea from '$lib/components/textarea.svelte';
-	import Checkbox from '$lib/components/checkbox.svelte';
+	import Button from '#lib/components/button.svelte';
+	import Input from '#lib/components/input.svelte';
+	import Textarea from '#lib/components/textarea.svelte';
+	import Checkbox from '#lib/components/checkbox.svelte';
 	import { CheckIcon, CircleXIcon } from '@lucide/svelte';
 	import FaqItem from './faq-item.svelte';
 	import { submit } from './submit.remote';
@@ -85,13 +85,13 @@
 		<ul class="mt-2 list-inside list-disc space-y-1">
 			<li>
 				Expiration notifications 30 days, 14 days, 7 days and 1 day before the date (<a
-					href={resolve('/preview/expiring')}
+					href={resolve('/preview/[template]', { template: 'expiring' })}
 					class="link">preview</a
 				>).
 			</li>
 			<li>
 				Certificate change notifications when your certificate is replaced (<a
-					href={resolve('/preview/certificate-changed')}
+					href={resolve('/preview/[template]', { template: 'certificate-changed' })}
 					class="link">preview</a
 				>).
 				<span class="cursor-default rounded bg-blue-800 px-1.25 py-px text-xs text-white uppercase"
@@ -100,7 +100,7 @@
 			</li>
 			<li>
 				Heartbeat reports with the status of your certificates every 2 weeks (<a
-					href={resolve('/preview/heartbeat')}
+					href={resolve('/preview/[template]', { template: 'heartbeat' })}
 					class="link">preview</a
 				>).
 				<span class="cursor-default rounded bg-blue-800 px-1.25 py-px text-xs text-white uppercase"

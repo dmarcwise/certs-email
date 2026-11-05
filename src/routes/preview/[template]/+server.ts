@@ -5,10 +5,10 @@ import {
 	renderExpiringDomainEmail,
 	renderHeartbeatEmail,
 	renderCertificateChangedEmail,
-} from '$lib/server/email-templates';
+} from '#lib/server/email-templates.ts';
 import type { RequestHandler } from './$types';
-import { env } from '$env/dynamic/private';
-import { formatExpirationDate } from '$lib/server/utils';
+import { WEBSITE_URL } from '$app/env/private';
+import { formatExpirationDate } from '#lib/server/utils.ts';
 
 function formatDate(date: Date): string {
 	return date.toISOString().split('T')[0];
@@ -32,11 +32,11 @@ function makeCert(domain: string, days: number) {
 
 const previewData = {
 	confirmation: {
-		confirmUrl: `${env.WEBSITE_URL}/confirm?token=abc123XYZ456def789GHI012jkl345MNO678pqr901STU234vwx567YZA890bcd`,
+		confirmUrl: `${WEBSITE_URL}/confirm?token=abc123XYZ456def789GHI012jkl345MNO678pqr901STU234vwx567YZA890bcd`,
 	},
 	'confirmed-domains': {
 		domains: ['example.com', 'api.example.com', 'www.example.org'],
-		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
+		settingsUrl: `${WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
 	},
 	heartbeat: () => ({
 		generatedDate: formatDate(new Date()),
@@ -50,7 +50,7 @@ const previewData = {
 		],
 		pending: [{ domain: 'pending.example.com' }],
 		totalDomains: 9,
-		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
+		settingsUrl: `${WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
 	}),
 	expiring: {
 		domain: 'example.com',
@@ -61,7 +61,7 @@ const previewData = {
 		cn: '*.example.com',
 		san: ['example.com', '*.example.com', 'www.example.com'],
 		serial: '03A12B4C5D6E7F890ABCDEF0123456789ABC',
-		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
+		settingsUrl: `${WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
 		isCritical: true,
 		isExpired: false,
 	},
@@ -74,7 +74,7 @@ const previewData = {
 		cn: 'api.example.com',
 		san: ['api.example.com'],
 		serial: '05C34D6E7F890ABCDEF0123456789ABCDE',
-		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
+		settingsUrl: `${WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
 		isCritical: false,
 		isExpired: false,
 	},
@@ -87,7 +87,7 @@ const previewData = {
 		cn: 'legacy.example.com',
 		san: ['legacy.example.com'],
 		serial: '02D45E7F890ABCDEF0123456789ABCDEF',
-		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
+		settingsUrl: `${WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
 		isCritical: true,
 		isExpired: true,
 	},
@@ -112,7 +112,7 @@ const previewData = {
 			cn: '*.example.com',
 			san: ['example.com', '*.example.com', 'www.example.com'],
 		},
-		settingsUrl: `${env.WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
+		settingsUrl: `${WEBSITE_URL}/?token=xyz123ABC456def789GHI012jkl345MNO678pqr901STU`,
 	},
 };
 

@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { db } from '$lib/server/db';
+import { db } from '#lib/server/db.ts';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const settingsToken = url.searchParams.get('token');

@@ -1,11 +1,11 @@
 import { form } from '$app/server';
 import { z } from 'zod';
 import { invalid, redirect } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { EmailOutboxPriorities } from '$lib/server/email';
-import { createLogger } from '$lib/server/logger';
-import { renderConfirmedDomainsEmail } from '$lib/server/email-templates';
-import { env } from '$env/dynamic/private';
+import { db } from '#lib/server/db.ts';
+import { EmailOutboxPriorities } from '#lib/server/email.ts';
+import { createLogger } from '#lib/server/logger.ts';
+import { renderConfirmedDomainsEmail } from '#lib/server/email-templates.ts';
+import { WEBSITE_URL } from '$app/env/private';
 
 const logger = createLogger('confirm');
 
@@ -70,7 +70,7 @@ export const confirm = form(
 );
 
 async function queueConfirmedDomainsEmail(to: string, domains: string[], settingsToken: string) {
-	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
+	const settingsUrl = `${WEBSITE_URL}/?token=${settingsToken}`;
 	const { html, text } = renderConfirmedDomainsEmail({ domains, settingsUrl });
 
 	await db.emailOutbox.create({

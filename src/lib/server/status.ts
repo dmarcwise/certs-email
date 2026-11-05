@@ -1,4 +1,4 @@
-import { DomainStatus } from '$prisma/generated/enums';
+import { DomainStatus } from '#prisma/generated/enums.ts';
 
 const MS_PER_DAY = 86_400_000;
 

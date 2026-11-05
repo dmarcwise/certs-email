@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { userPrefersMode } from 'mode-watcher';
 	import { SproutIcon } from '@lucide/svelte';
-	import EuFlagImage from '$lib/assets/eu-flag.png';
+	import EuFlagImage from '#lib/assets/eu-flag.png';
 </script>
 
 <footer class="container mb-12">

@@ -1,8 +1,6 @@
-import type { HandleServerError, ServerInit } from '@sveltejs/kit';
-// @ts-expect-error - SvelteKitError exists but types aren't exported
-import { SvelteKitError } from '@sveltejs/kit/internal';
-import { startWorker } from '$lib/server/worker';
-import { createLogger } from '$lib/server/logger';
+import type { HandleServerError, ServerInit } from '@sveltejs/kit/hooks';
+import { startWorker } from '#lib/server/worker.ts';
+import { createLogger } from '#lib/server/logger.ts';
 
 const logger = createLogger('hooks');
 
@@ -11,9 +9,9 @@ export const init: ServerInit = async () => {
 	startWorker();
 };
 
-export const handleError: HandleServerError = async ({ error }) => {
-	// Ignore 404 errors
-	if (error instanceof SvelteKitError && (error as SvelteKitError).status === 404) {
+export const handleError: HandleServerError = async ({ error, kind }) => {
+	// Ignore expected, validation, and 404 errors
+	if (kind === 'app' || kind === 'validation' || (kind === 'framework' && error.status === 404)) {
 		return;
 	}
 

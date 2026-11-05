@@ -1,6 +1,6 @@
 import dns from 'node:dns';
 import tls, { type PeerCertificate } from 'node:tls';
-import { isValidGlobalIPv4 } from '$lib/server/utils';
+import { isValidGlobalIPv4 } from '#lib/server/utils.ts';
 
 const DEFAULT_TIMEOUT_MS = 10_000;
 

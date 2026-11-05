@@ -1,8 +1,8 @@
 import { form } from '$app/server';
 import { z } from 'zod';
 import { invalid, redirect } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { createLogger } from '$lib/server/logger';
+import { db } from '#lib/server/db.ts';
+import { createLogger } from '#lib/server/logger.ts';
 
 const logger = createLogger('unsubscribe');
 

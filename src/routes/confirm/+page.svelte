@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { confirm } from './confirm.remote';
-	import Button from '$lib/components/button.svelte';
+	import Button from '#lib/components/button.svelte';
 	import { CheckIcon } from '@lucide/svelte';
 
 	const { token } = confirm.fields;

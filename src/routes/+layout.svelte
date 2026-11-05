@@ -4,7 +4,7 @@
 	import '@fontsource/firago/600'; // semi-bold
 	import '@fontsource/firago/700'; // bold
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '#lib/assets/favicon.svg';
 	import { ModeWatcher } from 'mode-watcher';
 	import { resolve } from '$app/paths';
 	import Footer from './footer.svelte';

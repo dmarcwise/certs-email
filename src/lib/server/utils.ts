@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 import ipaddr from 'ipaddr.js';
-import { DomainStatus } from '$prisma/generated/enums';
+import { DomainStatus } from '#prisma/generated/enums.ts';
 
 const BASE62_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 

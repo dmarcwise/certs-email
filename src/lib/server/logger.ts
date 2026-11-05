@@ -1,4 +1,4 @@
-import { dev } from '$app/environment';
+import { dev } from '$app/env';
 import { createRequire } from 'node:module';
 import pino, { type Logger, type LoggerOptions } from 'pino';
 import type { PrettyOptions } from 'pino-pretty';

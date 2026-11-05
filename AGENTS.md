@@ -20,7 +20,7 @@ The code must pass Svelte checks, formatting, and linting before committing:
 
 ## Imports
 
-Properly use SvelteKit aliases like `$templates` and `$prisma` in imports.
+Use the subpath imports declared in `package.json`, like `#lib`, `#templates`, and `#prisma`.
 
 ## Migrations
 

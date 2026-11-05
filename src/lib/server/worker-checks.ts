@@ -1,16 +1,16 @@
-import { db } from '$lib/server/db';
-import { Prisma } from '$prisma/generated/client';
-import { DomainStatus } from '$prisma/generated/enums';
-import { formatExpirationDate, formatExpiresIn } from '$lib/server/utils';
+import { db } from '#lib/server/db.ts';
+import { Prisma } from '#prisma/generated/client.ts';
+import { DomainStatus } from '#prisma/generated/enums.ts';
+import { formatExpirationDate, formatExpiresIn } from '#lib/server/utils.ts';
 import {
 	renderExpiringDomainEmail,
 	renderCertificateChangedEmail,
-} from '$lib/server/email-templates';
-import { EmailOutboxPriorities } from '$lib/server/email';
-import { createLogger } from '$lib/server/logger';
-import { CertFetchError, type CertificateInfo, fetchCertificate } from '$lib/server/fetch-cert';
-import { computeDomainStatus } from '$lib/server/status';
-import { env } from '$env/dynamic/private';
+} from '#lib/server/email-templates.ts';
+import { EmailOutboxPriorities } from '#lib/server/email.ts';
+import { createLogger } from '#lib/server/logger.ts';
+import { CertFetchError, type CertificateInfo, fetchCertificate } from '#lib/server/fetch-cert.ts';
+import { computeDomainStatus } from '#lib/server/status.ts';
+import { WEBSITE_URL } from '$app/env/private';
 
 export const CHECK_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
 const CHECK_STALE_THRESHOLD_MS = 6 * 60 * 60 * 1000; // 6 hours
@@ -222,7 +222,7 @@ async function queueExpiringDomainEmail(
 	settingsToken: string,
 ) {
 	const metadata = EXPIRATION_EMAIL_METADATA[status];
-	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
+	const settingsUrl = `${WEBSITE_URL}/?token=${settingsToken}`;
 	const daysRemaining = Math.ceil((notAfter.getTime() - Date.now()) / 86_400_000);
 
 	const { html, text } = renderExpiringDomainEmail({
@@ -272,7 +272,7 @@ async function queueCertificateChangedEmail(
 	},
 	settingsToken: string,
 ) {
-	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
+	const settingsUrl = `${WEBSITE_URL}/?token=${settingsToken}`;
 
 	const { html, text } = renderCertificateChangedEmail({
 		domain,

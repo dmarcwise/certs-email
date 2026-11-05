@@ -1,7 +1,7 @@
 import { createLogger } from './logger';
-import { CHECK_INTERVAL_MS, runChecks } from '$lib/server/worker-checks';
-import { EMAIL_OUTBOX_POLL_INTERVAL_MS, runEmailOutbox } from '$lib/server/worker-email-outbox';
-import { HEARTBEAT_INTERVAL_MS, runHeartbeat } from '$lib/server/worker-heartbeat';
+import { CHECK_INTERVAL_MS, runChecks } from '#lib/server/worker-checks.ts';
+import { EMAIL_OUTBOX_POLL_INTERVAL_MS, runEmailOutbox } from '#lib/server/worker-email-outbox.ts';
+import { HEARTBEAT_INTERVAL_MS, runHeartbeat } from '#lib/server/worker-heartbeat.ts';
 
 const logger = createLogger('worker');
 

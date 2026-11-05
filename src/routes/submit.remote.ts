@@ -1,13 +1,13 @@
 import { form } from '$app/server';
 import { z } from 'zod';
 import { invalid, redirect } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { createConfirmationToken, generateToken } from '$lib/server/utils';
-import { EmailOutboxPriorities } from '$lib/server/email';
-import { createLogger } from '$lib/server/logger';
-import { DomainStatus } from '$prisma/generated/enums';
-import { renderConfirmationEmail } from '$lib/server/email-templates';
-import { env } from '$env/dynamic/private';
+import { db } from '#lib/server/db.ts';
+import { createConfirmationToken, generateToken } from '#lib/server/utils.ts';
+import { EmailOutboxPriorities } from '#lib/server/email.ts';
+import { createLogger } from '#lib/server/logger.ts';
+import { DomainStatus } from '#prisma/generated/enums.ts';
+import { renderConfirmationEmail } from '#lib/server/email-templates.ts';
+import { WEBSITE_URL } from '$app/env/private';
 
 const logger = createLogger('submit');
 
@@ -194,7 +194,7 @@ export const submit = form(
 );
 
 async function queueConfirmationEmail(to: string, confirmToken: string) {
-	const confirmUrl = `${env.WEBSITE_URL}/confirm?token=${confirmToken}`;
+	const confirmUrl = `${WEBSITE_URL}/confirm?token=${confirmToken}`;
 	const { html, text } = renderConfirmationEmail({ confirmUrl });
 
 	await db.emailOutbox.create({

@@ -1,7 +1,7 @@
-import { db } from '$lib/server/db';
-import type { EmailOutbox } from '$prisma/generated/client';
-import { createLogger } from '$lib/server/logger';
-import { sendQueuedEmail } from '$lib/server/email';
+import { db } from '#lib/server/db.ts';
+import type { EmailOutbox } from '#prisma/generated/client.ts';
+import { createLogger } from '#lib/server/logger.ts';
+import { sendQueuedEmail } from '#lib/server/email.ts';
 
 export const EMAIL_OUTBOX_POLL_INTERVAL_MS = 10_000;
 const EMAIL_OUTBOX_BATCH_SIZE = 10;

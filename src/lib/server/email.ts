@@ -1,16 +1,16 @@
-import { env } from '$env/dynamic/private';
+import { LETTERMINT_API_TOKEN } from '$app/env/private';
 import { Lettermint } from 'lettermint';
-import { building, dev } from '$app/environment';
-import type { EmailOutbox } from '$prisma/generated/client';
+import { building, dev } from '$app/env';
+import type { EmailOutbox } from '#prisma/generated/client.ts';
 
-if (!building && !env.LETTERMINT_API_TOKEN) {
+if (!building && !LETTERMINT_API_TOKEN) {
 	throw new Error('LETTERMINT_API_TOKEN is not set');
 }
 
 let lettermint: Lettermint | undefined;
 
 function getLettermint() {
-	if (!lettermint) lettermint = new Lettermint({ sendingToken: env.LETTERMINT_API_TOKEN! });
+	if (!lettermint) lettermint = new Lettermint({ sendingToken: LETTERMINT_API_TOKEN! });
 	return lettermint;
 }
 

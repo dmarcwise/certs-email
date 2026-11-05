@@ -1,16 +1,16 @@
 import Handlebars from 'handlebars';
 import juice from 'juice';
-import confirmationTemplate from '$templates/confirmation.hbs?raw';
-import confirmationTextTemplate from '$templates/confirmation.text.hbs?raw';
-import confirmedDomainsTemplate from '$templates/confirmed-domains.hbs?raw';
-import confirmedDomainsTextTemplate from '$templates/confirmed-domains.text.hbs?raw';
-import heartbeatTemplate from '$templates/heartbeat.hbs?raw';
-import heartbeatTextTemplate from '$templates/heartbeat.text.hbs?raw';
-import expiringDomainTemplate from '$templates/expiring-domain.hbs?raw';
-import expiringDomainTextTemplate from '$templates/expiring-domain.text.hbs?raw';
-import certificateChangedTemplate from '$templates/certificate-changed.hbs?raw';
-import certificateChangedTextTemplate from '$templates/certificate-changed.text.hbs?raw';
-import commonStyles from '$templates/styles.css?raw';
+import confirmationTemplate from '#templates/confirmation.hbs?raw';
+import confirmationTextTemplate from '#templates/confirmation.text.hbs?raw';
+import confirmedDomainsTemplate from '#templates/confirmed-domains.hbs?raw';
+import confirmedDomainsTextTemplate from '#templates/confirmed-domains.text.hbs?raw';
+import heartbeatTemplate from '#templates/heartbeat.hbs?raw';
+import heartbeatTextTemplate from '#templates/heartbeat.text.hbs?raw';
+import expiringDomainTemplate from '#templates/expiring-domain.hbs?raw';
+import expiringDomainTextTemplate from '#templates/expiring-domain.text.hbs?raw';
+import certificateChangedTemplate from '#templates/certificate-changed.hbs?raw';
+import certificateChangedTextTemplate from '#templates/certificate-changed.text.hbs?raw';
+import commonStyles from '#templates/styles.css?raw';
 
 const templates: Record<string, { html: string; text: string }> = {
 	confirmation: { html: confirmationTemplate, text: confirmationTextTemplate },

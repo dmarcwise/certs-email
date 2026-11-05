@@ -1,10 +1,10 @@
-import { createLogger } from '$lib/server/logger';
-import { db } from '$lib/server/db';
-import { type Domain, DomainStatus } from '$prisma/generated/client';
-import { formatExpirationDate, formatExpiresIn } from '$lib/server/utils';
-import { renderHeartbeatEmail } from '$lib/server/email-templates';
-import { EmailOutboxPriorities } from '$lib/server/email';
-import { env } from '$env/dynamic/private';
+import { createLogger } from '#lib/server/logger.ts';
+import { db } from '#lib/server/db.ts';
+import { type Domain, DomainStatus } from '#prisma/generated/client.ts';
+import { formatExpirationDate, formatExpiresIn } from '#lib/server/utils.ts';
+import { renderHeartbeatEmail } from '#lib/server/email-templates.ts';
+import { EmailOutboxPriorities } from '#lib/server/email.ts';
+import { WEBSITE_URL } from '$app/env/private';
 
 export const HEARTBEAT_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const HEARTBEAT_PERIOD_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
@@ -108,7 +108,7 @@ async function queueHeartbeatEmail(
 	totalDomains: number,
 	settingsToken: string,
 ) {
-	const settingsUrl = `${env.WEBSITE_URL}/?token=${settingsToken}`;
+	const settingsUrl = `${WEBSITE_URL}/?token=${settingsToken}`;
 	const { html, text } = renderHeartbeatEmail({
 		generatedDate,
 		critical,

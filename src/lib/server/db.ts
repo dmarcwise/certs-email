@@ -1,9 +1,9 @@
-import { PrismaClient } from '$prisma/generated/client';
+import { PrismaClient } from '#prisma/generated/client.ts';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { building, dev } from '$app/environment';
-import { env } from '$env/dynamic/private';
+import { building, dev } from '$app/env';
+import { DATABASE_URL } from '$app/env/private';
 
-if (!building && !env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
+if (!building && !DATABASE_URL) throw new Error('DATABASE_URL is not set');
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
@@ -11,7 +11,7 @@ export const db =
 	globalForPrisma.prisma ??
 	new PrismaClient({
 		adapter: new PrismaPg({
-			connectionString: env.DATABASE_URL,
+			connectionString: DATABASE_URL,
 			ssl: !dev && { rejectUnauthorized: false },
 		}),
 	});
