@@ -1,4 +1,5 @@
 import { dev } from '$app/environment';
+import { createRequire } from 'node:module';
 import pino, { type Logger, type LoggerOptions } from 'pino';
 import type { PrettyOptions } from 'pino-pretty';
 
@@ -15,7 +16,7 @@ const loggerConfig: LoggerOptions = {
 
 if (dev) {
 	loggerConfig.transport = {
-		target: 'pino-pretty',
+		target: createRequire(import.meta.url).resolve('pino-pretty'),
 		options: {
 			colorize: true,
 			singleLine: true,
