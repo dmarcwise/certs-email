@@ -10,7 +10,7 @@ if (!building && !env.LETTERMINT_API_TOKEN) {
 let lettermint: Lettermint | undefined;
 
 function getLettermint() {
-	if (!lettermint) lettermint = new Lettermint({ apiToken: env.LETTERMINT_API_TOKEN! });
+	if (!lettermint) lettermint = new Lettermint({ sendingToken: env.LETTERMINT_API_TOKEN! });
 	return lettermint;
 }
 
@@ -32,16 +32,14 @@ async function sendEmail(options: {
 	text?: string;
 	tag?: string;
 }) {
-	const email = getLettermint()
-		.email.from(`${defaultFrom.name} <${defaultFrom.email}>`)
-		.to(...options.to)
-		.subject(options.subject)
-		.html(options.html);
-
-	if (options.text) email.text(options.text);
-	if (options.tag) email.tag(options.tag);
-
-	await email.send();
+	await getLettermint().emails.send({
+		from: `${defaultFrom.name} <${defaultFrom.email}>`,
+		to: options.to,
+		subject: options.subject,
+		html: options.html,
+		text: options.text || undefined,
+		tag: options.tag || undefined,
+	});
 }
 
 export async function sendQueuedEmail(job: EmailOutbox) {
