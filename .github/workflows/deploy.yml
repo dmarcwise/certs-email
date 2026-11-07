@@ -15,7 +15,7 @@ on:
 jobs:
   PROD-build-and-push:
     name: '[PROD] Build and push'
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     if: inputs.deploy_target == 'PROD'
     permissions:
       contents: read
