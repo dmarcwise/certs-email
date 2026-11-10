@@ -22,13 +22,13 @@ jobs:
       packages: write
     steps:
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
+        uses: docker/login-action@v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v7.4.0
         with:
           file: Dockerfile
           push: true
@@ -45,9 +45,9 @@ jobs:
       SERVER: dmw-prod-1.taild99d78.ts.net
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
       - name: Connect to tailnet
-        uses: tailscale/github-action@v4.3.0
+        uses: tailscale/github-action@v4.4.0
         with:
           # Federated identity:
           # - Subject: repo:dmarcwise@175476939/certs-email@1122347473:ref:refs/heads/main
