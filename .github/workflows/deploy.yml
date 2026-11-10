@@ -40,7 +40,6 @@ jobs:
     needs: PROD-build-and-push
     permissions:
       contents: read
-      packages: read
       id-token: write
     env:
       SERVER: dmw-prod-1.taild99d78.ts.net
@@ -78,7 +77,6 @@ jobs:
             COMPOSE_FILE_PATH=$COMPOSE_DESTINATION_PATH \
             OP_CONNECT_TOKEN=${{ secrets.OP_CONNECT_TOKEN }} \
             DOCKER_REGISTRY_NAME=ghcr.io \
-            DOCKER_REGISTRY_USERNAME=${{ github.actor }} \
-            DOCKER_REGISTRY_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+            DOCKER_REGISTRY_USERNAME=dmw-bot \
             DOCKER_IMAGE=ghcr.io/${{ github.repository }}:${{ github.sha }} \
             'bash -s' < .github/workflows/deploy.sh
