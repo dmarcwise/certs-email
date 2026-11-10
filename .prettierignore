@@ -11,3 +11,7 @@ bun.lockb
 # Email templates: plain-text formatting is intentional, and Prettier's
 # Handlebars parser mangles the HTML ones (drops <!DOCTYPE>, rewrites quotes).
 src/templates/*.hbs
+
+# Test output
+/test-results
+/playwright-report

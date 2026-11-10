@@ -44,10 +44,16 @@ function formatName(value: string | string[] | undefined): string | null {
 	}
 }
 
+export interface FetchCertificateOptions {
+	timeoutMs?: number;
+	/** Allow connecting to non-public addresses (e.g. loopback). Only meant for tests. */
+	allowNonPublicAddresses?: boolean;
+}
+
 export async function fetchCertificate(
 	hostname: string,
 	port: number,
-	timeoutMs: number = DEFAULT_TIMEOUT_MS,
+	{ timeoutMs = DEFAULT_TIMEOUT_MS, allowNonPublicAddresses = false }: FetchCertificateOptions = {},
 ): Promise<CertificateInfo> {
 	return new Promise((resolve, reject) => {
 		let settled = false;
@@ -79,7 +85,9 @@ export async function fetchCertificate(
 					return;
 				}
 
-				const publicIp = addresses.find((address) => isValidGlobalIPv4(address.address));
+				const publicIp = addresses.find(
+					(address) => allowNonPublicAddresses || isValidGlobalIPv4(address.address),
+				);
 				if (!publicIp) {
 					callback(new CertFetchError('DNS lookup returned no public IPv4 addresses'), '');
 					return;

@@ -17,16 +17,21 @@
 		"lint": "prettier --check . && eslint .",
 		"generate-migration": "prisma migrate dev --create-only",
 		"migrate": "prisma migrate deploy",
+		"test": "npm run test:integration && npm run test:e2e",
+		"test:integration": "vitest run",
+		"test:e2e": "vite build && playwright test",
 		"check-updates": "npx npm-check-updates -i --format group,repo --cooldown 1d",
 		"check-updates-semver": "npx npm-check-updates -i --format group,repo --cooldown 1d --target semver"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
+		"@playwright/test": "^1.65.0",
 		"@sveltejs/adapter-node": "^6.0.0",
 		"@sveltejs/kit": "^3.0.0",
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@tailwindcss/typography": "^0.5.20",
 		"@tailwindcss/vite": "^4.3.4",
+		"@testcontainers/postgresql": "^12.2.1",
 		"@types/node": "^24.13.2",
 		"@types/pg": "^8.23.1",
 		"eslint": "^10.14.0",
@@ -36,12 +41,14 @@
 		"prettier": "^3.9.10",
 		"prettier-plugin-svelte": "^4.1.1",
 		"prettier-plugin-tailwindcss": "^0.8.1",
+		"selfsigned": "^5.5.0",
 		"svelte": "^5.57.3",
 		"svelte-check": "^4.7.8",
 		"tailwindcss": "^4.3.4",
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.72.1",
-		"vite": "^8.0.12"
+		"vite": "^8.0.12",
+		"vitest": "^5.1.0"
 	},
 	"dependencies": {
 		"@fontsource/firago": "^5.3.0",

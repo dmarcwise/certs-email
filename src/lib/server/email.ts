@@ -1,4 +1,4 @@
-import { LETTERMINT_API_TOKEN } from '$app/env/private';
+import { LETTERMINT_API_TOKEN, LETTERMINT_BASE_URL } from '$app/env/private';
 import { Lettermint } from 'lettermint';
 import { building, dev } from '$app/env';
 import type { EmailOutbox } from '#prisma/generated/client.ts';
@@ -10,7 +10,13 @@ if (!building && !LETTERMINT_API_TOKEN) {
 let lettermint: Lettermint | undefined;
 
 function getLettermint() {
-	if (!lettermint) lettermint = new Lettermint({ sendingToken: LETTERMINT_API_TOKEN! });
+	if (!lettermint) {
+		lettermint = new Lettermint({
+			sendingToken: LETTERMINT_API_TOKEN!,
+			// Only overridden in tests, to point to a fake API server
+			baseUrl: LETTERMINT_BASE_URL || undefined,
+		});
+	}
 	return lettermint;
 }
 

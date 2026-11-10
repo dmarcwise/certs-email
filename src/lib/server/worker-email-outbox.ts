@@ -2,8 +2,9 @@ import { db } from '#lib/server/db.ts';
 import type { EmailOutbox } from '#prisma/generated/client.ts';
 import { createLogger } from '#lib/server/logger.ts';
 import { sendQueuedEmail } from '#lib/server/email.ts';
+import { EMAIL_OUTBOX_POLL_INTERVAL_MS as POLL_INTERVAL_OVERRIDE_MS } from '$app/env/private';
 
-export const EMAIL_OUTBOX_POLL_INTERVAL_MS = 10_000;
+export const EMAIL_OUTBOX_POLL_INTERVAL_MS = POLL_INTERVAL_OVERRIDE_MS ?? 10_000;
 const EMAIL_OUTBOX_BATCH_SIZE = 10;
 const EMAIL_OUTBOX_MAX_ATTEMPTS = 15;
 const EMAIL_OUTBOX_INITIAL_DELAY_MS = 10_000;
