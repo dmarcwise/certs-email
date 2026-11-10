@@ -10,6 +10,11 @@
 	"rangeStrategy": "bump",
 	"schedule": ["* * * * 3"],
 	"vulnerabilityAlerts": { "enabled": false },
+	"lockFileMaintenance": {
+		"description": "Refresh transitive dependencies in package-lock.json within their allowed ranges, which picks up their security fixes. The minimum release age comes from .npmrc, not minimumReleaseAge",
+		"enabled": true,
+		"schedule": ["* * * * 3"]
+	},
 	// Temporary: npm 12 refuses registry tarballs of packages with bundleDependencies (EALLOWREMOTE on
 	// @tailwindcss/oxide-wasm32-wasi), which breaks lockfile updates. Remove once https://github.com/npm/cli/issues/9800 is fixed
 	"constraints": { "npm": "^11" },
