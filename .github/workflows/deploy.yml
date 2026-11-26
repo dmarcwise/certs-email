@@ -69,14 +69,18 @@ jobs:
         env:
           COMPOSE_SOURCE_PATH: docker-compose.yml
           COMPOSE_DESTINATION_PATH: /tmp/certs-email.yml
+          OP_CONNECT_TOKEN: ${{ secrets.OP_CONNECT_TOKEN }}
         run: |
           set -euo pipefail
           scp -i ~/.ssh/key $COMPOSE_SOURCE_PATH deploy@$SERVER:$COMPOSE_DESTINATION_PATH
-          ssh deploy@$SERVER \
+          # Send the token through stdin to avoid leaking it in audit logs and the process list
+          {
+            printf 'export OP_CONNECT_TOKEN=%q\n' "$OP_CONNECT_TOKEN"
+            cat .github/workflows/deploy.sh
+          } | ssh deploy@$SERVER \
             -i ~/.ssh/key \
             COMPOSE_FILE_PATH=$COMPOSE_DESTINATION_PATH \
-            OP_CONNECT_TOKEN=${{ secrets.OP_CONNECT_TOKEN }} \
             DOCKER_REGISTRY_NAME=ghcr.io \
             DOCKER_REGISTRY_USERNAME=dmw-bot \
             DOCKER_IMAGE=ghcr.io/${{ github.repository }}:${{ github.sha }} \
-            'bash -s' < .github/workflows/deploy.sh
+            'bash -s'
